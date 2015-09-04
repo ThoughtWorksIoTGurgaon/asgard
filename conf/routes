@@ -3,4 +3,5 @@
 # ~~~~
 
 POST 		/:deviceId/status											controller.MainController.status(deviceId)
+GET 		/test														controller.MainController.test
 #

@@ -6,6 +6,7 @@ import play.api.libs.concurrent.Akka
 import play.api.Play.current
 import akka.actor.Props
 import actor.DeviceLoggerSupervisor
+import actor.QueenBeePubSubActor
 
 
 /**
@@ -14,17 +15,23 @@ import actor.DeviceLoggerSupervisor
 
 object MainController extends Controller {
 
-  val deviceLoggerSupervisor = Akka.system.actorOf(Props[DeviceLoggerSupervisor],"DeviceSupervisor")
+  val queenBeeActor = Akka.system.actorOf(Props[QueenBeePubSubActor],"QueenBeePubActor")
   
   def status(deviceId: String) = Action(parse.json){
   request=> request.body.validate[Device].map{
     case device@Device(id,status)=> 
-      deviceLoggerSupervisor ! device
+      queenBeeActor ! device
     Ok(deviceId)
     
     }.recoverTotal {
       e=>BadRequest(s"$e")
     }
+  }
+  
+  def test = Action {
+    request=>
+      queenBeeActor ! "Hello from scala!"
+      Ok("Publishing message to mosquitto")
   }
 
 
