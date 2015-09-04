@@ -1,51 +1,49 @@
 <div class="container">
-		<div ng-controller = "DevicesCTRL" class="list-unstyled">
-			<div class="row-fluid">				
-				<div class="span4">
-					<h1>Devices</h1>
-				</div>
-				<div class="span8" style="height:60px">
-					<button class="btn btn-primary btn-fab btn-fab-mini btn-raised mdi-content-add pull-right btn-xs"></button>
-					<button type="button" class="btn btn-default btn-fab btn-fab-mini pull-right btn-success mdi-action-dashboard btn-xs">
-					</button>
-				</div>
-			</div>
-			<div class="row-fluid">
-				<div class="span4">
-					<accordion class="accordion" close-others="oneAtATime" >
-					<div ui-sortable="sortableOptions" ng-model ="devices" class="accordion">
-						<div accordion-group ng-repeat="device in devices" class="indent panel" is-open="status.open">
-							<accordion-heading>
-							{{device.Title}}
-							<i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
-							</accordion-heading>
-							<div>
-								<div>Description: {{device.Description}}</div>
-								<div>Status: {{device.Status}}</div>
-									<div class="indent">
-										<h3>Status</h3>
-										<h3>Peripherals</h3>
-										<ul class="list-unstyled indent">
-											<li ng-repeat="switch in device.Switches">
-												<div>
-													<div class="togglebutton">
-														<label>
-															<input type="checkbox" ng-model="switch.State">
-															<span class="toggle"></span>
-																{{switch.Label}}
-														</label>
-													</div>
-												</div>
-											</li>
-										</ul>
-									</div>
-							</div>	
-						</div>
-					</div>
-					</accordion>
-				</div>
-			</div>
-			<div class="row-fluid">
-			</div>
-		</div>
+    <div ng-controller = "DevicesCTRL" class="list-unstyled">
+      <div class="row-fluid">       
+        <div class="span4">
+          <h1>Devices</h1>
+        </div>
+        <div class="span8" style="height:60px">
+          <button class="btn btn-primary btn-fab btn-fab-mini btn-raised mdi-content-add pull-right btn-xs"></button>
+          <button type="button" class="btn btn-default btn-fab btn-fab-mini pull-right btn-success mdi-action-dashboard btn-xs">
+          </button>
+        </div>
+      </div>
+      <div class="row-fluid">
+        <div class="span4">
+          <accordion class="accordion" close-others="oneAtATime" >
+          <div ui-sortable="sortableOptions" ng-model ="devices" class="accordion">
+            <div accordion-group ng-repeat="device in devices" class="indent panel" is-open="status.open">
+              <accordion-heading>
+              {{device.title}}
+              <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
+              </accordion-heading>
+              <div>
+                <div>Description: {{device.description}}</div>
+                <div>Status: {{device.dtatus}}</div>
+                  <div class="indent">
+                    <h3>Status</h3>
+                    <h3>Peripherals</h3>
+                    <ul class="list-unstyled indent">
+                      <li ng-repeat="switch in device.switches">
+                        <div class="togglebutton" id="{{switch.id}}">
+                          <label>
+                            <input type="checkbox" ng-model="switch.state" ng-change="changeState(switch.id)">
+                            <span class="toggle"></span>
+                              {{switch.label}}
+                          </label>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+              </div>  
+            </div>
+          </div>
+          </accordion>
+        </div>
+      </div>
+      <div class="row-fluid">
+      </div>
+    </div>
 </div>
