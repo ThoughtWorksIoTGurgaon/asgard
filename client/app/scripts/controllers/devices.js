@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('cloudStoreClient')
-  .controller('DevicesCTRL',function DeviceCTRL($scope) {
+  .controller('DevicesCTRL',function DeviceCTRL($scope,$http) {
     
     $scope.sortableOptions = {
       disabled: false
@@ -12,19 +12,19 @@ angular.module('cloudStoreClient')
       {
         "title": "Master Bedroom",
         "description": "Controls the master bedroom",
-        "id": "ABCD12345",
+        "id": "ABCD12356",
         "status": "UP",
         "temperature": "34",
         "switches": [
             {
                 "label": "Fan",
                 "state": true,
-                "id" : "1234"
+                "id" : "my-device-id:0"
             },
             {
                 "label": "AC",
                 "state": true,
-                "id": "abc"
+                "id": "my-device-id:1"
             }
         ]
       },
@@ -48,7 +48,14 @@ angular.module('cloudStoreClient')
         ]
       }
     ]; 
-    $scope.changeState = function() {
-      console.log("Hello!!!!!");
+    $scope.changeState = function($switch) {
+    	
+    	var postData = JSON.stringify($switch);
+    	console.log("Switch--->" + postData);
+    	$http({
+    	    method: 'POST',
+    	    url: 'http://localhost:8080/device',
+    	    data: postData
+    	});
     };   
 });

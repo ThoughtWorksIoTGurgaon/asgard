@@ -2,6 +2,7 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
-POST 		/:deviceId/status											controller.MainController.status(deviceId)
+POST 		/device											controller.MainController.device
+OPTIONS    /*path     										controller.MainController.options(path)
 GET 		/test														controller.MainController.test
 #

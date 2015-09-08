@@ -39,6 +39,7 @@ libraryDependencies ++= Seq(
   jdbc,
   anorm,
   "net.sigusr" %% "scala-mqtt-client" % "0.6.0",
+  "com.softwaremill.macwire" %% "macros" % "1.0.1",
   "xalan" % "xalan" % "2.7.1",
   "com.typesafe.akka" %% "akka-actor" % "2.3.12",
   "com.softwaremill.macwire" %% "macros" % "0.7.3",

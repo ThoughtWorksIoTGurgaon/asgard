@@ -13,15 +13,17 @@ import akka.actor.ActorRef
 import net.sigusr.mqtt.api.Connected
 import net.sigusr.mqtt.api.Publish
 import scala.concurrent.duration._
+import actor.QueenBeeSupervisor._
 
 /**
  * @author syedatifakhtar
  */
-class QueenBeePubSubActor extends Actor {
+class QueenBeePubSubActor(queue: String,_supervisor: ActorRef) extends Actor {
   import context.dispatcher
 
-  private val localSubscriber = "/device/hello"
-  private val localPublisher = "/device/hello"
+  private val localSubscriber = queue
+  private val localPublisher = queue
+  private val supervisor = _supervisor
   
   context.actorOf(Manager.props(new InetSocketAddress(1883))) ! Connect(localSubscriber)
 
@@ -31,16 +33,18 @@ class QueenBeePubSubActor extends Actor {
       println("Successfully connected to localhost:1883")
       println(s"Ready to publish to topic [ $localPublisher ]")
       context become ready(sender())
-      self ! "Hi from scala"
+      supervisor ! ConnectedToMQTT
     case ConnectionFailure(reason) ⇒
       println(s"Connection to localhost:1883 failed [$reason]")
+      supervisor ! WaitingReconnect
   }
 
   def ready(mqttManager: ActorRef): Receive = {
-    case m: String ⇒
-      println(s"Publishing [ $m ]")
-      mqttManager ! Publish(localPublisher, m.getBytes("UTF-8").to[Vector])
+    case UpdateDeviceState(device) ⇒
+      println(s"Updating device $device")
+      mqttManager ! Publish(localPublisher, "Hello!".getBytes("UTF-8").to[Vector])
   }
+  
 }
 
 object LocalPublisher {
