@@ -29,7 +29,7 @@
                       <li ng-repeat="switch in device.switches">
                         <div class="togglebutton" id="{{switch.id}}">
                           <label>
-                            <input type="checkbox" ng-model="switch.state" ng-change="changeState(switch)">
+                            <input type="checkbox" ng-model="switch.data" ng-change="changeState(switch)" ng-true-value="'on'" ng-false-value="'off'">
                             <span class="toggle"></span>
                               {{switch.label}}
                           </label>

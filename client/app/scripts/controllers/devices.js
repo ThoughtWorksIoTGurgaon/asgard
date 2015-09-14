@@ -19,12 +19,16 @@ angular.module('cloudStoreClient')
             {
                 "label": "Fan",
                 "state": true,
-                "id" : "my-device-id:0"
+                "id" : "my-device-id:0",
+                "serviceAddress":"sdFGHDjv7w6fdsF:0",
+                "data": "off"
             },
             {
                 "label": "AC",
                 "state": true,
-                "id": "my-device-id:1"
+                "id": "my-device-id:1",
+                "serviceAddress":"sdFGHDjv7w6fdsF:0",
+                "data": "off"
             }
         ]
       },
@@ -38,12 +42,16 @@ angular.module('cloudStoreClient')
             {
                 "label": "Fan",
                 "state": false,
-                "id": "xyz"
+                "id": "xyz",
+                "serviceAddress":"sdFGHDjv7w6fdsF:0",
+                "data": "off"
             },
             {
                 "label": "Fridge",
                 "state": true,
-                "id": "def"
+                "id": "def",
+                "serviceAddress":"sdFGHDjv7w6fdsF:0",
+                "data": "off"
             }
         ]
       }

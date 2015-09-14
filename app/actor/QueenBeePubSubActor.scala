@@ -1,19 +1,17 @@
 package actor
 
-import akka.actor.Actor
-import akka.actor.ActorSystem
-import com.typesafe.config.ConfigFactory
-import scala.concurrent.duration.FiniteDuration
-import net.sigusr.mqtt.api.ConnectionFailure
+import java.net.InetAddress
 import java.net.InetSocketAddress
-import net.sigusr.mqtt.api.Manager
-import scala.util.Random
-import net.sigusr.mqtt.api.Connect
+import actor.QueenBeeSupervisor._
+import akka.actor.Actor
 import akka.actor.ActorRef
 import net.sigusr.mqtt.api.Connected
+import net.sigusr.mqtt.api.ConnectionFailure
 import net.sigusr.mqtt.api.Publish
-import scala.concurrent.duration._
-import actor.QueenBeeSupervisor._
+import java.net.Inet4Address
+import net.sigusr.mqtt.api.Manager
+import net.sigusr.mqtt.api.Connect
+import play.api.libs.json.Json
 
 /**
  * @author syedatifakhtar
@@ -21,19 +19,20 @@ import actor.QueenBeeSupervisor._
 class QueenBeePubSubActor(queue: String,_supervisor: ActorRef) extends Actor {
   import context.dispatcher
 
-  private val localSubscriber = queue
-  private val localPublisher = queue
+  private val localSubscriber = "Harry Potter"
+  private val localPublisher = "Harry Potter"
   private val supervisor = _supervisor
   
-  context.actorOf(Manager.props(new InetSocketAddress(1883))) ! Connect(localSubscriber)
+  context.actorOf(Manager.props(new InetSocketAddress(InetAddress.getByName("192.168.1.3"),1883))) ! Connect(localSubscriber)
 
 
   def receive: Receive = {
     case Connected ⇒
       println("Successfully connected to localhost:1883")
       println(s"Ready to publish to topic [ $localPublisher ]")
-      context become ready(sender())
       supervisor ! ConnectedToMQTT
+      context become ready(sender())
+
     case ConnectionFailure(reason) ⇒
       println(s"Connection to localhost:1883 failed [$reason]")
       supervisor ! WaitingReconnect
@@ -42,7 +41,7 @@ class QueenBeePubSubActor(queue: String,_supervisor: ActorRef) extends Actor {
   def ready(mqttManager: ActorRef): Receive = {
     case UpdateDeviceState(device) ⇒
       println(s"Updating device $device")
-      mqttManager ! Publish(localPublisher, "Hello!".getBytes("UTF-8").to[Vector])
+      mqttManager ! Publish("/service/sdFGHDjv7w6fdsF:0/cmd", Json.toJson(device).toString.getBytes("UTF-8").to[Vector])
   }
   
 }

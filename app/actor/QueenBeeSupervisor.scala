@@ -8,7 +8,7 @@ import akka.actor.Props
 import model.Device
 import actor.QueenBeeSupervisor._
 import play.api.Logger
-
+ 
 
 /**
  * @author syedatifakhtar
@@ -20,26 +20,37 @@ class QueenBeeSupervisor extends Actor{
      Restart
  }
    
-   val queenBeeWorker = context.actorOf(Props(new QueenBeePubSubActor("/devices/+/",self)))
    
+   val queenBeeWorker = context.actorOf(Props(new QueenBeePubSubActor("/services/#",self)),"queenBeeWorker")
+   
+   
+   self.path.name
    def receive = {
      case ConnectedToMQTT=>
           context become liveConsume
           Logger.debug("Connected to MQTT Broker,ready to receive!")
+     case cmd:Command =>
+       queenBeeWorker ! cmd
      case WaitingReconnect=>
+              println(s"\n\n\n\n\n------------------Waiting to reconnect-------------")
           context become waitingReconnect
+      
    }
    
    def liveConsume: Receive = {
      case cmd:Command =>
+       println("In live consume")
        queenBeeWorker ! cmd
      case WaitingReconnect=>
+       println(s"\n\n\n\n\n------------------Waiting to reconnect-------------")
      context become waitingReconnect
        
    }
    
    def waitingReconnect: Receive = {
+     
      case ConnectedToMQTT=>
+           println("Waiting to reconnect")
           context become liveConsume
    }
 

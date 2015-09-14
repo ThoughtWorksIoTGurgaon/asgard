@@ -20,7 +20,7 @@ object MainController extends Controller {
     request =>
       println(s"Got some request!! ${request.body}")
       request.body.validate[Device].map {
-        case device @ Device(label, state, id) =>
+        case device @ Device(label, state, id,_,_) =>
           queenBeeSupervisor ! UpdateDeviceState(device)
           Ok(s"Received device: $device").withHeaders(
             ACCESS_CONTROL_ALLOW_ORIGIN -> "*")
