@@ -32,6 +32,11 @@ angular
         controller: 'AboutCtrl',
         controllerAs: 'about'
       })
+      .when('/add-device', {
+        templateUrl: 'views/add_device.html',
+        controller: 'AddDeviceCtrl',
+        controllerAs: 'addDevice'
+      })
       .otherwise({
         redirectTo: '/'
       });

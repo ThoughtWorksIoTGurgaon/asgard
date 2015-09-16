@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('cloudStoreClient')
-  .controller('DevicesCTRL',function DeviceCTRL($scope,$http) {
+  .controller('DevicesCtrl', function ($scope,$http) {
     
     $scope.sortableOptions = {
       disabled: false
@@ -57,13 +57,13 @@ angular.module('cloudStoreClient')
       }
     ]; 
     $scope.changeState = function($switch) {
-    	
-    	var postData = JSON.stringify($switch);
-    	console.log("Switch--->" + postData);
-    	$http({
-    	    method: 'POST',
-    	    url: 'http://localhost:8080/device',
-    	    data: postData
-    	});
-    };   
+        
+        var postData = JSON.stringify($switch);
+        console.log("Switch--->" + postData);
+        $http({
+            method: 'POST',
+            url: 'http://localhost:8080/device',
+            data: postData
+        });
+    };
 });

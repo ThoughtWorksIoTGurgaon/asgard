@@ -1,0 +1,26 @@
+<div ng-init="hello()">
+  <div ng-show="serviceAddresses.length > 0">
+    <h3>Following services were found</h3>
+    <!-- <div class="list-group">
+      <div ng-repeat="serviceAddress in serviceAddresses">
+        <div class="list-group-item">
+          <div class="row-action-primary">
+            <i class="mdi-file-folder"></i>
+          </div>
+          <div class="row-content">
+            <h4 class="list-group-item-heading">{{serviceAddress}}</h4>
+          </div>
+        </div>
+        <div class="list-group-separator"></div>
+      </div>
+    </div>
+  </div> -->
+  <div class="panel panel-default" ng-repeat="serviceAddress in serviceAddresses">
+    <div class="panel-body">
+        <h4>{{serviceAddress}}</h4>
+    </div>
+</div>
+  <div ng-hide="serviceAddresses.length > 0">
+    No services found
+  </div>
+</div>
