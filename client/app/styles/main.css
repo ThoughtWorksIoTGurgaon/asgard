@@ -114,3 +114,7 @@ input::-webkit-inner-spin-button {
     border-bottom: 0;
   }
 }
+
+.vertical-middle {
+    vertical-align: middle
+}

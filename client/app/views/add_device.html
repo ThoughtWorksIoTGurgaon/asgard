@@ -1,26 +1,31 @@
 <div ng-init="hello()">
   <div ng-show="serviceAddresses.length > 0">
-    <h3>Following services were found</h3>
-    <!-- <div class="list-group">
-      <div ng-repeat="serviceAddress in serviceAddresses">
-        <div class="list-group-item">
-          <div class="row-action-primary">
-            <i class="mdi-file-folder"></i>
-          </div>
-          <div class="row-content">
-            <h4 class="list-group-item-heading">{{serviceAddress}}</h4>
-          </div>
-        </div>
-        <div class="list-group-separator"></div>
+    <h3>Click to map a service to device.</h3>
+
+    <script type="text/ng-template" id="myModalContent.html">
+      <div class="modal-header">
+        <h3 class="modal-title">Map {{selected_service_address}}</h3>
+      </div>
+      <div class="modal-body">
+	
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" type="button" ng-click="ok()">OK</button>
+        <button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
+      </div>
+    </script>
+
+    
+    <div class="panel panel-default" ng-repeat="serviceAddress in serviceAddresses">
+      <div class="panel-body">
+	<h4 class="inline">{{serviceAddress}}</h4>
+	<i class="pull-right glyphicon glyphicon-pencil vertical-middle" ng-click="open('{{serviceAddress}}')"></i>
       </div>
     </div>
-  </div> -->
-  <div class="panel panel-default" ng-repeat="serviceAddress in serviceAddresses">
-    <div class="panel-body">
-        <h4>{{serviceAddress}}</h4>
+    <div ng-hide="serviceAddresses.length > 0">
+      No services found
     </div>
-</div>
-  <div ng-hide="serviceAddresses.length > 0">
-    No services found
   </div>
 </div>
+
+
