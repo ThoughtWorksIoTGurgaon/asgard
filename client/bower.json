@@ -21,7 +21,7 @@
     "angular-mocks": "^1.4.0"
   },
   "appPath": "app",
-  "moduleName": "theGymApp",
+  "moduleName": "cloudStoreClient",
   "overrides": {
     "bootstrap": {
       "main": [
