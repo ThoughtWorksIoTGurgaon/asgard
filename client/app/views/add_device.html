@@ -1,5 +1,5 @@
 <div ng-init="hello()">
-  <div ng-show="serviceAddresses.length > 0">
+  <div ng-show="services.length > 0">
     <h3>Click to map a service to device</h3>
 
     <script type="text/ng-template" id="myModalContent.html">
@@ -37,15 +37,15 @@
     </script>
 
     
-    <div class="panel panel-default" ng-repeat="serviceAddress in serviceAddresses">
+    <div class="panel panel-default" ng-repeat="service in services">
       <div class="panel-body">
-        <h4 class="inline">{{serviceAddress}}</h4>
-        <a href="javascript:;"><i class="pull-right glyphicon glyphicon-pencil vertical-middle" ng-click="open('{{serviceAddress}}')"></i></a>
+        <h4 class="inline">{{service.address}}</h4>
+        <a href="javascript:;"><i class="pull-right glyphicon glyphicon-pencil vertical-middle" ng-click="open('{{service.address}}')"></i></a>
       </div>
     </div>
-    <div ng-hide="serviceAddresses.length > 0">
-      No services found
-    </div>
+  </div>
+  <div ng-hide="services.length > 0">
+    No services found
   </div>
 </div>
 

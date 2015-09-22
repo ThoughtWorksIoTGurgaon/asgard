@@ -3,10 +3,15 @@
 angular.module('cloudStoreClient')
     .controller('AddDeviceCtrl', function ($scope,$http,$modal) {
   $scope.hello = function() {
-      $scope.serviceAddresses = ['1234', 'ABCD', 'WXYZ'];
-      $scope.animationsEnabled = true;
-      $scope.open = function(selected_service){
+    $http.get('http://localhost:8080/services').then(function(response) {
+      $scope.services = response.data.services;
+    }, function(response) {
+      $scope.services = [];
+    });
+    $scope.animationsEnabled = true;   
+  };   
 
+  $scope.open = function(selected_service){
     var modalInstance = $modal.open({
         animation: $scope.animationsEnabled,
         templateUrl: 'myModalContent.html',
@@ -18,8 +23,7 @@ angular.module('cloudStoreClient')
       }
         }
     });    
-    }
-  };   
+  }
 });
 
 

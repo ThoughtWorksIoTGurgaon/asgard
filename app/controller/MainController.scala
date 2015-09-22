@@ -1,5 +1,6 @@
 package controller
 import model._
+import play.api.libs.json._
 import play.api.mvc.Action
 import play.api.mvc.Controller
 import play.api.libs.concurrent.Akka
@@ -30,6 +31,12 @@ object MainController extends Controller {
           BadRequest(s"$e").withHeaders(
             ACCESS_CONTROL_ALLOW_ORIGIN -> "*")
       }
+  }
+
+  def services() = Action {
+    var serviceList = List(Service("1234"), Service("ABCD"))
+    Ok(Json.obj("services" -> serviceList)).withHeaders(
+      ACCESS_CONTROL_ALLOW_ORIGIN -> "*")
   }
 
   def options(path: String) = Action {
