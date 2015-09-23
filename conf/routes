@@ -6,4 +6,5 @@ POST 		/device											controller.MainController.device
 OPTIONS    /*path     										controller.MainController.options(path)
 GET 		/test														controller.MainController.test
 GET /services                       controller.MainController.services
+GET  /public/*file        controllers.Assets.at(path="/public", file)
 #

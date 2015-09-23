@@ -23,7 +23,7 @@ class QueenBeePubSubActor(queue: String,_supervisor: ActorRef) extends Actor {
   private val localPublisher = "Harry Potter"
   private val supervisor = _supervisor
   
-  context.actorOf(Manager.props(new InetSocketAddress(InetAddress.getByName("192.168.1.3"),1883))) ! Connect(localSubscriber)
+  context.actorOf(Manager.props(new InetSocketAddress(1883))) ! Connect(localSubscriber)
 
 
   def receive: Receive = {

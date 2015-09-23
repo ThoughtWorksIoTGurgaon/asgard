@@ -12,7 +12,6 @@ angular
   .module('cloudStoreClient', [
     'ngAnimate',
     'ngCookies',
-    'ngMessages',
     'ngResource',
     'ngRoute',
     'ngSanitize',
@@ -195,7 +194,7 @@ angular.module('cloudStoreClient').controller('ModalInstanceCtrl', ["$scope", "$
   };
 }]);
 
-angular.module('theGymApp').run(['$templateCache', function($templateCache) {
+angular.module('cloudStoreClient').run(['$templateCache', function($templateCache) {
   'use strict';
 
   $templateCache.put('views/about.html',
