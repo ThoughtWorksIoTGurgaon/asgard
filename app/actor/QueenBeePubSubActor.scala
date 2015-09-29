@@ -12,15 +12,19 @@ import java.net.Inet4Address
 import net.sigusr.mqtt.api.Manager
 import net.sigusr.mqtt.api.Connect
 import play.api.libs.json.Json
+import scala.concurrent.duration._
+import model.QueenBeeMessage
+
 
 class QueenBeePubSubActor(queue: String, _supervisor: ActorRef) extends Actor {
   import context.dispatcher
 
-  private val localSubscriber = "Harry Potter"
-  private val localPublisher = "Harry Potter"
+  private val localSubscriber = "SCALA_QueenBee_Subscriber"
+  private val localPublisher = "SCALA_QueenBee_Publisher"
   private val supervisor = _supervisor
   
-  context.actorOf(Manager.props(new InetSocketAddress(1883))) ! Connect(localSubscriber)
+  var mqttManager = context.actorOf(Manager.props(new InetSocketAddress(1883)))
+  context.system.scheduler.scheduleOnce(0 minutes,mqttManager,Connect(localPublisher))
 
 
   def receive: Receive = {
@@ -31,7 +35,8 @@ class QueenBeePubSubActor(queue: String, _supervisor: ActorRef) extends Actor {
       context become ready(sender())
 
     case ConnectionFailure(reason) ⇒
-      println(s"Connection to localhost:1883 failed [$reason]")
+      println(s"Connection to localhost:1883 failed [$reason] - trying reconnect in 5 minutes")
+        context.system.scheduler.scheduleOnce(5 minutes,mqttManager,Connect(localPublisher))
       supervisor ! WaitingReconnect
   }
 
