@@ -13,10 +13,7 @@ import net.sigusr.mqtt.api.Manager
 import net.sigusr.mqtt.api.Connect
 import play.api.libs.json.Json
 
-/**
- * @author syedatifakhtar
- */
-class QueenBeePubSubActor(queue: String,_supervisor: ActorRef) extends Actor {
+class QueenBeePubSubActor(queue: String, _supervisor: ActorRef) extends Actor {
   import context.dispatcher
 
   private val localSubscriber = "Harry Potter"
@@ -39,9 +36,14 @@ class QueenBeePubSubActor(queue: String,_supervisor: ActorRef) extends Actor {
   }
 
   def ready(mqttManager: ActorRef): Receive = {
-    case UpdateDeviceState(device) ⇒
-      println(s"Updating device $device")
-      mqttManager ! Publish("/service/sdFGHDjv7w6fdsF:0/cmd", Json.toJson(device).toString.getBytes("UTF-8").to[Vector])
+    case UpdateDeviceState(qbMessage) ⇒
+      println(s"Sending service $qbMessage.address data $qbMessage.request with data $qbMessage.data")
+      
+      mqttManager ! 
+      Publish(
+        s"/service/${qbMessage.address}/cmd", 
+        Json.toJson(qbMessage).toString.getBytes("UTF-8").to[Vector]
+      )
   }
   
 }

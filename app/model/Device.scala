@@ -1,10 +1,8 @@
 package model
 import play.api.libs.json._
-/*
- * @author syedatifakhtar
- */
 
-case class Device(label: String,state: Boolean,id: String,data: String,serviceAddress: String)
+case class Device(id: String, title: String, description: String, services: List[Service])
+
 object Device {
   implicit val deviceFormat = Json.format[Device]
 }

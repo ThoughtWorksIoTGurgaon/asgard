@@ -1,0 +1,38 @@
+<div ng-init="loadDevices()">
+  <div class="row-fluid">       
+    <div class="span4">
+      <h1>Devices</h1>
+    </div>
+  </div>
+  <div class="row-fluid">
+    <div class="span4">
+      <accordion class="accordion" close-others="oneAtATime" >
+      <div ng-model ="devices" class="accordion">
+        <div accordion-group ng-repeat="device in devices" class="indent panel" is-open="status">
+          <accordion-heading>
+          {{device.title}}
+          <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status, 'glyphicon-chevron-right': !status}"></i>
+          </accordion-heading>
+          <div>
+            <div>Description: {{device.description}}</div>
+              <div class="indent">
+                <h3>Peripherals</h3>
+                <ul class="list-unstyled indent">
+                  <li ng-repeat="service in device.services">
+                    <div class="togglebutton" id="{{service.id}}">
+                      <label>
+                        <input type="checkbox" ng-model="service.status" ng-change="changeState(service)" ng-true-value="'on'" ng-false-value="'off'">
+                        <span class="toggle"></span>
+                          {{service.label}}
+                      </label>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+          </div>  
+        </div>
+      </div>
+      </accordion>
+    </div>
+  </div>
+</div>

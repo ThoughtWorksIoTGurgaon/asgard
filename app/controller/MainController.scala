@@ -9,21 +9,17 @@ import akka.actor.Props
 import actor.QueenBeeSupervisor
 import actor.QueenBeeSupervisor.UpdateDeviceState
 
-/**
- * @author syedatifakhtar
- */
-
 object MainController extends Controller {
 
   val queenBeeSupervisor = Akka.system.actorOf(Props[QueenBeeSupervisor],"QueenBeeSupervisor")
 
-  def device() = Action(parse.json) {
+  def service() = Action(parse.json) {
     request =>
       println(s"Got some request!! ${request.body}")
-      request.body.validate[Device].map {
-        case device @ Device(label, state, id,_,_) =>
-          queenBeeSupervisor ! UpdateDeviceState(device)
-          Ok(s"Received device: $device").withHeaders(
+      request.body.validate[QueenBeeMessage].map {
+        case queenBeeMessage @ QueenBeeMessage(address, request, data) =>
+          queenBeeSupervisor ! UpdateDeviceState(queenBeeMessage)
+          Ok(s"Received service: $queenBeeMessage").withHeaders(
             ACCESS_CONTROL_ALLOW_ORIGIN -> "*")
       }.recoverTotal {
         e =>
@@ -33,24 +29,27 @@ object MainController extends Controller {
       }
   }
 
-  def services() = Action {
-    var serviceList = List(Service("1234"), Service("ABCD"))
-    Ok(Json.obj("services" -> serviceList)).withHeaders(
+  def devices() = Action {
+    var devicesList = List(
+      Device(
+        "ABCD12355",
+        "Master Bedroom",
+        "Controls the master bedroom",
+        List(
+          Service(
+            Some("1234"),
+            "Fan", 
+            "my-device-id:1", 
+            "off", 
+            List(
+              "switch-on", 
+              "switch-off"
+            )
+          )
+        )
+      )
+    )
+    Ok(Json.obj("devices" -> devicesList)).withHeaders(
       ACCESS_CONTROL_ALLOW_ORIGIN -> "*")
   }
-
-  def options(path: String) = Action {
-    Ok("").withHeaders(
-      "Access-Control-Allow-Origin" -> "*",
-      "Access-Control-Allow-Methods" -> "GET, POST, PUT, DELETE, OPTIONS",
-      "Access-Control-Allow-Headers" -> "Accept, Origin, Content-type, X-Json, X-Prototype-Version, X-Requested-With",
-      "Access-Control-Allow-Credentials" -> "true",
-      "Access-Control-Max-Age" -> (0).toString)
-  }
-
-  def test = Action {
-    request =>
-      Ok("Publishing message to mosquitto")
-  }
-
 }

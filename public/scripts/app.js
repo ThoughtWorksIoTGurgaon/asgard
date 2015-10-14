@@ -15,28 +15,38 @@ angular
     'ngResource',
     'ngRoute',
     'ngSanitize',
-	'ui.sortable',
-	'ui.bootstrap',
+    'ui.sortable',
+    'ui.bootstrap',
     'ngTouch'
   ])
   .config(function ($routeProvider) {
     $routeProvider
       .when('/', {
-        templateUrl: 'views/main.html',
-        controller: 'MainCtrl',
-        controllerAs: 'main'
+        templateUrl: 'views/devices.html',
+        controller: 'DevicesCtrl',
+        controllerAs: 'devicesCtrl'
       })
       .when('/about', {
         templateUrl: 'views/about.html',
         controller: 'AboutCtrl',
         controllerAs: 'about'
       })
+      .when('/about', {
+        templateUrl: 'views/about.html',
+        controller: 'AboutCtrl',
+        controllerAs: 'aboutCtrl'
+      })
       .when('/add-device', {
         templateUrl: 'views/add_device.html',
         controller: 'AddDeviceCtrl',
-        controllerAs: 'addDevice'
+        controllerAs: 'addDeviceCtrl'
       })
       .otherwise({
         redirectTo: '/'
       });
+  })
+  .controller('HeaderController', function($scope,$location){
+    $scope.isActive = function(viewLocation){
+      return viewLocation === $location.path();
+    };
   });
