@@ -4,22 +4,17 @@ angular.module('cloudStoreClient')
   .controller('DevicesCtrl', function ($scope,$http) {
     $scope.status=true;
     $scope.oneAtATime = true;
-    $scope.loadDevices = function(){
-        $http.get("/devices").then(function(response) {
+    $scope.loadAppliances = function(){
+        $http.get("/appliances").then(function(response) {
             console.log(response);
-            $scope.devices = response.data.devices;
+            $scope.appliances = response.data.appliances;
         }, function(response) {
-            $scope.devices = [];
+            $scope.appliances = [];
         });
     };
     $scope.changeState = function($service) {
-        var request = {
-            address: $service.address,
-            request: ($service.status === "on" ? "switch-on" : "switch-off"),
-            data: ""
-        };
-
-        var postData = JSON.stringify(request);
+        var postData = JSON.stringify({address: $service.address, value: $service.value});
+        //var postData = JSON.stringify($service);
         console.log("Switch--->" + postData);
         $http({
             method: 'POST',

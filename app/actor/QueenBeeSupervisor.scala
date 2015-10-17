@@ -5,25 +5,22 @@ import akka.actor.OneForOneStrategy
 import akka.actor.SupervisorStrategy._
 import scala.concurrent.duration._
 import akka.actor.Props
-import model.QueenBeeMessage
+import model.{ServiceRequest}
 import actor.QueenBeeSupervisor._
 import play.api.Logger
- 
 
-/**
- * @author syedatifakhtar
- */
 class QueenBeeSupervisor extends Actor{
   
-   override val supervisorStrategy = OneForOneStrategy(maxNrOfRetries = 10,withinTimeRange = 10 minutes){
-     case _:Exception =>
-       Restart
-   }
+   override val supervisorStrategy =
+     OneForOneStrategy(maxNrOfRetries = 10,withinTimeRange = 10 minutes){
+       case _:Exception =>
+         Restart
+     }
    
    val queenBeeWorker = context.actorOf(
     Props(new QueenBeePubSubActor("/services/#", self)),
     "queenBeeWorker"
-  )
+   )
    
    self.path.name
    def receive = {
@@ -63,5 +60,5 @@ object QueenBeeSupervisor {
   case object WaitingReconnect extends MQTTActorMessage
   
   trait Command
-  case class UpdateDeviceState(queenBeeMessage: QueenBeeMessage) extends Command
+  case class UpdateDeviceState(serviceRequest: ServiceRequest) extends Command
 }

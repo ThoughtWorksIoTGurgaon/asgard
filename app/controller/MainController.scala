@@ -11,15 +11,38 @@ import actor.QueenBeeSupervisor.UpdateDeviceState
 
 object MainController extends Controller {
 
-  val queenBeeSupervisor = Akka.system.actorOf(Props[QueenBeeSupervisor],"QueenBeeSupervisor")
+  val queenBeeSupervisor = Akka.system.actorOf(Props[QueenBeeSupervisor], "QueenBeeSupervisor")
 
-  def service() = Action(parse.json) {
+  var services = Map(
+    "my-device-id:1" ->
+      SwitchService(
+        "1234",
+        "my-device-id:1",
+        "Switch",
+        "on"
+      )
+  )
+
+  var appliancesList = List[Appliance](
+    Appliance(
+        "ABCD12355",
+        "Fan",
+        "Controls bedroom fan",
+        List(
+          services("my-device-id:1")
+        )
+      )
+  )
+
+  def service = Action(parse.json) {
     request =>
       println(s"Got some request!! ${request.body}")
-      request.body.validate[QueenBeeMessage].map {
-        case queenBeeMessage @ QueenBeeMessage(address, request, data) =>
-          queenBeeSupervisor ! UpdateDeviceState(queenBeeMessage)
-          Ok(s"Received service: $queenBeeMessage").withHeaders(
+      request.body.validate[WidgetStatus].map {
+        case widgetRequest @ WidgetStatus(address, status) =>
+          val serviceRequest = services(address).updateStatus(status)
+          queenBeeSupervisor ! UpdateDeviceState(serviceRequest)
+
+          Ok(s"Received widgetRequest: $widgetRequest").withHeaders(
             ACCESS_CONTROL_ALLOW_ORIGIN -> "*")
       }.recoverTotal {
         e =>
@@ -29,27 +52,8 @@ object MainController extends Controller {
       }
   }
 
-  def devices() = Action {
-    var devicesList = List(
-      Device(
-        "ABCD12355",
-        "Master Bedroom",
-        "Controls the master bedroom",
-        List(
-          Service(
-            Some("1234"),
-            "Fan", 
-            "my-device-id:1", 
-            "off", 
-            List(
-              "switch-on", 
-              "switch-off"
-            )
-          )
-        )
-      )
-    )
-    Ok(Json.obj("devices" -> devicesList)).withHeaders(
+  def appliances = Action {
+    Ok(Json.obj("appliances" -> appliancesList)).withHeaders(
       ACCESS_CONTROL_ALLOW_ORIGIN -> "*")
   }
 }
