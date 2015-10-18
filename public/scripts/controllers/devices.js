@@ -14,11 +14,10 @@ angular.module('cloudStoreClient')
     };
     $scope.changeState = function($service) {
         var postData = JSON.stringify({address: $service.address, value: $service.value});
-        //var postData = JSON.stringify($service);
         console.log("Switch--->" + postData);
         $http({
             method: 'POST',
-            url: '/service',
+            url: '/services/value',
             data: postData
         });
     };

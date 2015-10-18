@@ -118,3 +118,11 @@ input::-webkit-inner-spin-button {
 .vertical-middle {
     vertical-align: middle
 }
+
+.appliance-edit-modal .togglebutton label {
+  margin: 15px 10px;
+  width: 100%;
+}
+.appliance-edit-modal .togglebutton .toggle {
+  float: right;
+}

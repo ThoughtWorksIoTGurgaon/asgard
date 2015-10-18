@@ -31,12 +31,7 @@ angular
         controller: 'AboutCtrl',
         controllerAs: 'about'
       })
-      .when('/about', {
-        templateUrl: 'views/about.html',
-        controller: 'AboutCtrl',
-        controllerAs: 'aboutCtrl'
-      })
-      .when('/add-device', {
+      .when('/manage-appliance', {
         templateUrl: 'views/add_device.html',
         controller: 'AddDeviceCtrl',
         controllerAs: 'addDeviceCtrl'

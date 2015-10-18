@@ -2,9 +2,13 @@
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
-GET 		/appliances				controller.MainController.appliances
-POST 		/service					controller.MainController.service
-GET			/*file       			controllers.Assets.at(path="/public", file)
-GET			/       					controllers.Assets.at(path="/public", file="index.html")
+GET         /appliances                 controller.MainController.getAllAppliancesAction
+POST        /appliances/update          controller.MainController.updateAppliancesAction
+
+GET         /services/unassigned        controller.MainController.getUnassignedServicesAction
+POST        /services/value             controller.MainController.updateServiceValue
+
+GET         /*file                      controllers.Assets.at(path="/public", file)
+GET         /                           controllers.Assets.at(path="/public", file="index.html")
 
 #

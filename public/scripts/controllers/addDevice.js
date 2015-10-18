@@ -2,37 +2,55 @@
 
 angular.module('cloudStoreClient')
     .controller('AddDeviceCtrl', function ($scope,$http,$modal) {
-  $scope.hello = function() {
-    $http.get('http://localhost:8080/services').then(function(response) {
-      $scope.services = response.data.services;
+  $scope.loadAvailableServices = function() {
+    $http.get('/appliances').then(function(response) {
+      $scope.appliances = response.data.appliances;
     }, function(response) {
-      $scope.services = [];
+      $scope.appliances = [];
     });
     $scope.animationsEnabled = true;   
-  };   
+  };
 
-  $scope.open = function(selected_service){
+  $scope.openAddApplianceModal = function(selectedAppliance){
     var modalInstance = $modal.open({
         animation: $scope.animationsEnabled,
         templateUrl: 'myModalContent.html',
         controller: 'ModalInstanceCtrl',
-        selected_service: selected_service,
         resolve: {
-      selected_service_address: function () {
-          return selected_service;
-      }
+            appliance : function(){return selectedAppliance}
         }
-    });    
+    });
   };
 });
 
 
-angular.module('cloudStoreClient').controller('ModalInstanceCtrl', function ($scope, $modalInstance, selected_service_address) {
-  $scope.selected_service_address = selected_service_address;
+angular.module('cloudStoreClient')
+    .controller('ModalInstanceCtrl', function ($scope, $modalInstance, $http, appliance) {
 
-  $scope.submit = function(device) {
-    $modalInstance.close($scope.selected_service_address);
-    console.log(device);
+  $scope.allServices = appliance && appliance.services || [];
+  $scope.appliance = appliance;
+
+  $scope.newServices = {};
+  $scope.allServices.forEach(function(service){
+      $scope.newServices[service.address] = true;
+  });
+
+  $http.get('/services/unassigned').then(function(response) {
+      $scope.allServices = $scope.allServices.concat(response.data.services);
+  });
+
+  $scope.submit = function(appliance, newServices) {
+    $modalInstance.close();
+
+    appliance.services = $scope.allServices.filter(function(service){
+        return newServices[service.address];
+    });
+
+    $http({
+        method: 'POST',
+        url: '/appliances/update',
+        data: JSON.stringify(appliance)
+    });
   };
 
   $scope.cancel = function () {
