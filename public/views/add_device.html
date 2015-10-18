@@ -1,54 +1,57 @@
 <div ng-init="loadAvailableServices()">
-  <div ng-show="appliances.length > 0">
-    <h3>Manage appliances</h3>
-
-    <div class="span8" style="height:60px">
-      <button ng-click="openAddApplianceModal()" class="btn btn-primary btn-fab btn-fab-mini btn-raised mdi-content-add pull-right btn-xs"></button>
+  <div class="row-fluid">
+    <div class="span4">
+      <h1>Manage appliances</h1>
     </div>
+  </div>
 
-    <script type="text/ng-template" id="myModalContent.html">
-      <div class="modal-header">
-        <h3 class="modal-title">Add appliance</h3>
-      </div>
-      <div class="modal-body appliance-edit-modal">
-        <form class="form-horizontal">
-          <fieldset>
-            <div class="form-group">
-              <label for="applianceName" class="col-lg-3 control-label">Appliance Name</label>
-              <div class="col-lg-9">
-                <input type="text" class="form-control" id="applianceName" placeholder="Appliance name" ng-model="appliance.title">
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="applianceDescription" class="col-lg-3 control-label">Appliance Description</label>
-              <div class="col-lg-9">
-                <input type="text" class="form-control" id="applianceDescription" placeholder="Appliance description" ng-model="appliance.description">
-              </div>
-            </div>
-          </fieldset>
-        </form>
-        <div class="panel panel-default" ng-show="allServices.length > 0">
-          <div class="panel-heading">Services</div>
-          <ul class="list-group">
-            <li  class="list-group-item" ng-repeat="service in allServices">
-              <div class="togglebutton" id="{{service.id}}">
-                <label>
-                  {{service.label}} - {{service.address}}
-                  <input type="checkbox" checked ng-model="newServices[service.address]">
-                  <span class="toggle"></span>
-                </label>
-              </div>
-            </li>
-          </ul>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-primary" type="button" ng-click="submit(appliance, newServices)">Submit</button>
-        <button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
-      </div>
-    </script>
+  <div class="span8" style="height:60px">
+    <button ng-click="openAddApplianceModal()" class="btn btn-primary btn-fab btn-fab-mini btn-raised mdi-content-add pull-right btn-xs"></button>
+  </div>
 
-    
+  <script type="text/ng-template" id="myModalContent.html">
+    <div class="modal-header">
+      <h3 class="modal-title">Add appliance</h3>
+    </div>
+    <div class="modal-body appliance-edit-modal">
+      <form class="form-horizontal">
+        <fieldset>
+          <div class="form-group">
+            <label for="applianceName" class="col-lg-3 control-label">Appliance Name</label>
+            <div class="col-lg-9">
+              <input type="text" class="form-control" id="applianceName" placeholder="Appliance name" ng-model="appliance.title">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="applianceDescription" class="col-lg-3 control-label">Appliance Description</label>
+            <div class="col-lg-9">
+              <input type="text" class="form-control" id="applianceDescription" placeholder="Appliance description" ng-model="appliance.description">
+            </div>
+          </div>
+        </fieldset>
+      </form>
+      <div class="panel panel-default" ng-show="allServices.length > 0">
+        <div class="panel-heading">Services</div>
+        <ul class="list-group">
+          <li  class="list-group-item" ng-repeat="service in allServices">
+            <div class="togglebutton" id="{{service.id}}">
+              <label>
+                {{service.label}} - {{service.address}}
+                <input type="checkbox" checked ng-model="newServices[service.address]">
+                <span class="toggle"></span>
+              </label>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" type="button" ng-click="submit(appliance, newServices)">Submit</button>
+      <button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
+    </div>
+  </script>
+
+  <div ng-show="appliances.length > 0">
     <div class="panel panel-default" ng-repeat="appliance in appliances">
       <div class="panel-body">
         <h4 class="inline">{{appliance.title}} - {{appliance.description}}</h4>
@@ -60,7 +63,7 @@
     </div>
   </div>
   <div ng-hide="appliances.length > 0">
-    No services found
+    No appliances found
   </div>
 </div>
 

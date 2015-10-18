@@ -4,7 +4,7 @@
       <h1>Appliances</h1>
     </div>
   </div>
-  <div class="row-fluid">
+  <div class="row-fluid" ng-show="appliances.length > 0">
     <div class="span4">
       <accordion class="accordion" close-others="oneAtATime" >
       <div ng-model ="devices" class="accordion">
@@ -34,5 +34,8 @@
       </div>
       </accordion>
     </div>
+  </div>
+  <div ng-hide="appliances.length > 0">
+    No appliances found
   </div>
 </div>

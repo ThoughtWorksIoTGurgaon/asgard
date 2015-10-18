@@ -9,6 +9,8 @@ import akka.actor.Props
 import actor.QueenBeeSupervisor
 import actor.QueenBeeSupervisor.UpdateDeviceState
 
+import scala.util.Random
+
 object MainController extends Controller {
 
   val queenBeeSupervisor = Akka.system.actorOf(Props[QueenBeeSupervisor], "QueenBeeSupervisor")
@@ -37,18 +39,10 @@ object MainController extends Controller {
       )
   )
 
-  var appliancesMap = Map[String, Appliance](
-    "ABCD12355" -> Appliance(
-        "ABCD12355",
-        "Fan",
-        "Controls bedroom fan",
-        List(
-          allServicesMap("my-device-id:1")
-        )
-      )
-  )
+  var appliancesMap = Map[String, Appliance]()
 
   var unassignedServicesSet = Set(
+    allServicesMap("my-device-id:1"),
     allServicesMap("my-device-id:2"),
     allServicesMap("my-device-id:3")
   )
@@ -86,14 +80,18 @@ object MainController extends Controller {
       println(s"Got some request!! ${request.body}")
       request.body.validate[Appliance].map {
         case appliance @ Appliance(id, _, _, _) =>
-
+          var applianceId = id
           val newServices = appliance.services
-          val oldServices = appliancesMap(id).services
 
-          unassignedServicesSet ++= oldServices
+          if (applianceId != None && appliancesMap.contains(id.get)) {
+            val oldServices = appliancesMap(id.get).services
+            unassignedServicesSet ++= oldServices
+          } else {
+            applianceId = Option(Random.alphanumeric.take(5).mkString)
+          }
+
           unassignedServicesSet --= newServices
-
-          appliancesMap = appliancesMap updated (id, appliance)
+          appliancesMap = appliancesMap updated(applianceId.get, appliance)
 
           Ok(s"Appliance updated: $appliance").withHeaders(
             ACCESS_CONTROL_ALLOW_ORIGIN -> "*")
