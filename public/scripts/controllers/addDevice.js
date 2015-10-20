@@ -48,7 +48,7 @@ angular.module('cloudStoreClient')
 
     $http({
         method: 'POST',
-        url: '/appliances/update',
+        url: '/appliances/add',
         data: JSON.stringify(appliance)
     });
   };

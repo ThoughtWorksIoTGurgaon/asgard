@@ -9,7 +9,6 @@ angular.module('cloudStoreClient')
             console.log(response);
             $scope.appliances = response.data.appliances;
         }, function(response) {
-            $scope.appliances = [];
         });
     };
     $scope.changeState = function($service) {

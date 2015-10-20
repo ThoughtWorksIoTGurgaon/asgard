@@ -1,100 +1,56 @@
 package controller
-import actor.DiscoverySupervisor.UpdateDeviceState
+
+import actor.DiscoverySupervisor
+import actor.DiscoverySupervisor.{ApplianceConfigured, ApplianceAdded, UpdateDeviceState}
 import akka.actor.ActorRef
+import akka.pattern._
+import scala.concurrent.duration._
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import model._
 import play.api.libs.json._
 import play.api.mvc.{Action, Controller}
 
-import scala.util.Random
 
-class MainController(val queenBeeSupervisor: ActorRef) extends Controller {
+class MainController(val discoverySupervisor: ActorRef) extends Controller {
 
+  implicit val akkaTimeout = akka.util.Timeout(1 minute)
 
-  var allServicesMap = Map(
-    "my-device-id:1" ->
-      SwitchService(
-        "1234",
-        "my-device-id:1",
-        "Switch",
-        "on"
-      ),
-    "my-device-id:2" ->
-      SwitchService(
-        "1235",
-        "my-device-id:2",
-        "Switch",
-        "off"
-      ),
-    "my-device-id:3" ->
-      SwitchService(
-        "1236",
-        "my-device-id:3",
-        "Switch",
-        "on"
-      )
-  )
-
-  var appliancesMap = Map[String, Appliance]()
-
-  var unassignedServicesSet = Set(
-    allServicesMap("my-device-id:1"),
-    allServicesMap("my-device-id:2"),
-    allServicesMap("my-device-id:3")
-  )
-
-  def getUnassignedServicesAction = Action {
-    Ok(Json.obj("services" -> unassignedServicesSet)).withHeaders(
-      ACCESS_CONTROL_ALLOW_ORIGIN -> "*")
+  def getUnassignedServicesAction = Action.async {
+    val getUntaggedServices = discoverySupervisor.ask(DiscoverySupervisor.GetUntaggedServices).mapTo[List[SwitchService]]
+    getUntaggedServices.map {
+      services =>
+        Ok(Json.obj("services" -> Json.toJson(services)))
+    }
   }
 
-  def updateServiceValue() = Action(parse.json) {
-    request =>
-      println(s"Got some request!! ${request.body}")
-      request.body.validate[WidgetStatus].map {
-        case widgetRequest @ WidgetStatus(address, status) =>
-          val serviceRequest = allServicesMap(address).updateStatus(status)
-          queenBeeSupervisor ! UpdateDeviceState(serviceRequest)
 
-          Ok(s"Received widgetRequest: $widgetRequest").withHeaders(
-            ACCESS_CONTROL_ALLOW_ORIGIN -> "*")
-      }.recoverTotal {
-        e =>
-          println(s"Bad request!:$e")
-          BadRequest(s"$e").withHeaders(
-            ACCESS_CONTROL_ALLOW_ORIGIN -> "*")
-      }
+  def getAllAppliancesAction = Action.async {
+    val getAppliances = discoverySupervisor.ask(DiscoverySupervisor.GetAppliances).mapTo[List[Appliance]]
+    getAppliances.map {
+      appliances =>
+        Ok(Json.obj("appliances" -> Json.toJson(appliances)))
+    }
   }
 
-  def getAllAppliancesAction = Action {
-    Ok(Json.obj("appliances" -> appliancesMap.values)).withHeaders(
-      ACCESS_CONTROL_ALLOW_ORIGIN -> "*")
-  }
 
-  def updateAppliancesAction() = Action(parse.json) {
+  def addApplianceAction() = Action(parse.json) {
     request =>
       println(s"Got some request!! ${request.body}")
       request.body.validate[Appliance].map {
-        case appliance @ Appliance(id, _, _, _) =>
-          var applianceId = id
-          val newServices = appliance.services
+        appliance =>
+          discoverySupervisor ! ApplianceAdded(appliance)
+          Ok("")
+      }.recoverTotal(e=>BadRequest(s"Bad request $e"))
+  }
 
-          if (applianceId != None && appliancesMap.contains(id.get)) {
-            val oldServices = appliancesMap(id.get).services
-            unassignedServicesSet ++= oldServices
-          } else {
-            applianceId = Option(Random.alphanumeric.take(5).mkString)
-          }
 
-          unassignedServicesSet --= newServices
-          appliancesMap = appliancesMap updated(applianceId.get, appliance)
-
-          Ok(s"Appliance updated: $appliance").withHeaders(
-            ACCESS_CONTROL_ALLOW_ORIGIN -> "*")
-      }.recoverTotal {
-        e =>
-          println(s"Bad request!:$e")
-          BadRequest(s"$e").withHeaders(
-            ACCESS_CONTROL_ALLOW_ORIGIN -> "*")
-      }
+  def updateApplianceAction() = Action(parse.json) {
+    request =>
+      println(s"Got some request!! ${request.body}")
+      request.body.validate[Appliance].map {
+        appliance =>
+          discoverySupervisor ! ApplianceConfigured(appliance)
+          Ok("")
+      }.recoverTotal(e=>BadRequest(s"Bad request $e"))
   }
 }

@@ -1,16 +1,20 @@
 package model
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Writes, JsPath, Reads, Json}
 
-trait Service{
+import scalaz.Alpha.A
+
+
+abstract class Service{
 	def updateStatus(value: String) : ServiceRequest
-
+	def id: String
 }
+
 case class SwitchService(
-	id: String,
-	address: String,
-	label: String,
-	value: String
+	val id: String,
+	val address: String,
+	val label: String,
+	val value: String
 ) extends Service{
 	val widget = "radio-button"
 
@@ -27,10 +31,10 @@ object SwitchService{
 }
 
 case class SpeedService(
-	id: String,
-	address: String,
-	label: String,
-	value: String
+	val id: String,
+	val address: String,
+	val label: String,
+	val value: String
 ) extends Service{
 	val widget = "number-field"
 

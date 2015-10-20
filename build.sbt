@@ -1,7 +1,7 @@
 import play.PlayImport._
 import play.PlayScala
-import sbtassembly.Plugin.AssemblyKeys._
-import sbtassembly.Plugin.{PathList, MergeStrategy}
+import sbtassembly.Plugin._
+import AssemblyKeys._
 
 name := "CloudStore"
 
@@ -37,6 +37,8 @@ mergeStrategy in assembly := {
 
 libraryDependencies ++= Seq(
   ws exclude("commons-logging", "commons-logging"),
+  jdbc,
+  anorm,
   "net.sigusr" %% "scala-mqtt-client" % "0.6.0",
   "com.softwaremill.macwire" %% "macros" % "2.1.0" %"provided",
   "com.softwaremill.macwire" %% "util" % "2.1.0",

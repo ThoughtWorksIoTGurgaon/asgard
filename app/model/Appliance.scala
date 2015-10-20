@@ -3,10 +3,10 @@ package model
 import play.api.libs.json.Json
 
 case class Appliance(
-  id: Option[String],
-  title: String,
-  description: String,
-  services: List[SwitchService]
+  val id: Option[String],
+  val title: Option[String],
+  val description: Option[String],
+  val services: List[SwitchService]
 )
 
 object Appliance {

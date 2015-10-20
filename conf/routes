@@ -3,10 +3,11 @@
 # ~~~~
 
 GET         /appliances                 @controller.MainController.getAllAppliancesAction
-POST        /appliances/update          @controller.MainController.updateAppliancesAction
+POST        /appliances/update          @controller.MainController.updateApplianceAction
+POST        /appliances/add          @controller.MainController.addApplianceAction
 
 GET         /services/unassigned        @controller.MainController.getUnassignedServicesAction
-POST        /services/value             @controller.MainController.updateServiceValue
+#POST        /services/value             @controller.MainController.updateServiceValue
 
 GET         /*file                      controllers.Assets.at(path="/public", file)
 GET         /                           controllers.Assets.at(path="/public", file="index.html")

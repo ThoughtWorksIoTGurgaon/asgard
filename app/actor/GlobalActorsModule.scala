@@ -7,6 +7,8 @@ import com.softwaremill.macwire._
 
 
 trait GlobalActorsModule {
-  lazy val queenBeeSupervisor: ActorRef =
-    Akka.system.actorOf(Props(wire[DiscoverySupervisor]), "QueenBeeSupervisor")
+
+
+  lazy val discoverySupervisor: ActorRef =
+    Akka.system.actorOf(Props(wire[DiscoverySupervisor]), "DiscoverySupervisor")
 }
