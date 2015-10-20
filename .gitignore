@@ -26,4 +26,8 @@ project/plugins/project/
 .scala_dependencies
 .worksheet
 
+#IDEA IGNORE
 .idea
+.idea_modules/
+projectFilesBackup/
+projectFilesBackup1/

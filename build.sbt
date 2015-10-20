@@ -38,6 +38,7 @@ libraryDependencies ++= Seq(
   ws exclude("commons-logging", "commons-logging"),
   jdbc,
   anorm,
+  filters,
   "net.sigusr" %% "scala-mqtt-client" % "0.6.0",
   "com.softwaremill.macwire" %% "macros" % "1.0.1",
   "xalan" % "xalan" % "2.7.1",

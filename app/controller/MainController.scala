@@ -1,19 +1,14 @@
 package controller
+import actor.QueenBeeSupervisor.UpdateDeviceState
+import akka.actor.ActorRef
 import model._
 import play.api.libs.json._
-import play.api.mvc.Action
-import play.api.mvc.Controller
-import play.api.libs.concurrent.Akka
-import play.api.Play.current
-import akka.actor.Props
-import actor.QueenBeeSupervisor
-import actor.QueenBeeSupervisor.UpdateDeviceState
+import play.api.mvc.{Action, Controller}
 
 import scala.util.Random
 
-object MainController extends Controller {
+class MainController(val queenBeeSupervisor: ActorRef) extends Controller {
 
-  val queenBeeSupervisor = Akka.system.actorOf(Props[QueenBeeSupervisor], "QueenBeeSupervisor")
 
   var allServicesMap = Map(
     "my-device-id:1" ->

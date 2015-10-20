@@ -1,17 +1,10 @@
-import play.api.mvc._
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import actor.GlobalActorsModule
 import play.api.GlobalSettings
+import com.softwaremill.macwire._
 
-class CorsFilter extends EssentialFilter {
-  def apply(next: EssentialAction) = new EssentialAction {
-    def apply(requestHeader: RequestHeader) = {
-      next(requestHeader).map { result =>
-        println(s"Request headers---->\n ${requestHeader.headers}\n\n\n-----------------------------------------------")
-        result.withHeaders("Access-Control-Allow-Origin" -> "*"
-          )
-      }
-    }
-  }
+object Global extends GlobalSettings with GlobalActorsModule{
+
+  val wired = wiredInModule(Application)
+  override def getControllerInstance[A](controllerClass: Class[A]) = wired.lookupSingleOrThrow(controllerClass)
+
 }
-
-object Global extends WithFilters(new CorsFilter) with GlobalSettings
