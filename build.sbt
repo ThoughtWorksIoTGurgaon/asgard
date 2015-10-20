@@ -1,6 +1,7 @@
 import play.PlayImport._
 import play.PlayScala
 import sbtassembly.Plugin.AssemblyKeys._
+import sbtassembly.Plugin.{PathList, MergeStrategy}
 
 name := "CloudStore"
 
@@ -36,18 +37,15 @@ mergeStrategy in assembly := {
 
 libraryDependencies ++= Seq(
   ws exclude("commons-logging", "commons-logging"),
-  jdbc,
-  anorm,
-  filters,
   "net.sigusr" %% "scala-mqtt-client" % "0.6.0",
-  "com.softwaremill.macwire" %% "macros" % "1.0.1",
-  "xalan" % "xalan" % "2.7.1",
-  "com.typesafe.akka" %% "akka-actor" % "2.3.12",
-  "com.softwaremill.macwire" %% "macros" % "0.7.3",
-  "org.scalatestplus" %% "play" % "1.2.0" % "test",
-  "net.ceedubs" %% "ficus" % "1.1.2",
-  "org.scalamock" %% "scalamock-scalatest-support" % "3.2" % "test",
-  "de.leanovate.play-mockws" %% "play-mockws" % "0.12" % "test"
+  "com.softwaremill.macwire" %% "macros" % "2.1.0" %"provided",
+  "com.softwaremill.macwire" %% "util" % "2.1.0",
+  "com.softwaremill.macwire" %% "proxy" % "2.1.0",
+  "com.typesafe.akka" %% "akka-persistence-experimental" % "2.3.14",
+  "com.typesafe.akka" %% "akka-slf4j" % "2.3.11",
+  "ch.qos.logback" % "logback-classic" % "1.0.0" % "runtime",
+  "com.softwaremill.macwire" %% "macros" % "2.1.0",
+  "net.ceedubs" %% "ficus" % "1.1.2"
 )
 
 fork in run := true

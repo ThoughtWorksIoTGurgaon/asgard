@@ -6,10 +6,10 @@ import akka.actor.SupervisorStrategy._
 import scala.concurrent.duration._
 import akka.actor.Props
 import model.{ServiceRequest}
-import actor.QueenBeeSupervisor._
+import actor.DiscoverySupervisor._
 import play.api.Logger
 
-class QueenBeeSupervisor extends Actor{
+class DiscoverySupervisor extends Actor{
   
    override val supervisorStrategy =
      OneForOneStrategy(maxNrOfRetries = 10,withinTimeRange = 10 minutes){
@@ -18,7 +18,7 @@ class QueenBeeSupervisor extends Actor{
      }
    
    val queenBeeWorker = context.actorOf(
-    Props(new QueenBeePubSubActor("/services/#", self)),
+    Props(new DiscoveryActor("/services/#", self)),
     "queenBeeWorker"
    )
    
@@ -53,7 +53,7 @@ class QueenBeeSupervisor extends Actor{
    }
 }
 
-object QueenBeeSupervisor {
+object DiscoverySupervisor {
   
   trait MQTTActorMessage
   case object ConnectedToMQTT extends MQTTActorMessage

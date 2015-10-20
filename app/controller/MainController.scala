@@ -1,5 +1,5 @@
 package controller
-import actor.QueenBeeSupervisor.UpdateDeviceState
+import actor.DiscoverySupervisor.UpdateDeviceState
 import akka.actor.ActorRef
 import model._
 import play.api.libs.json._
