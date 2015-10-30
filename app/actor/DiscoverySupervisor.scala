@@ -58,7 +58,11 @@ class DiscoverySupervisor extends Actor{
    }
    
    def waitingReconnect: Receive = {
-     
+     case cmd:Command =>
+       log.debug("In live consume")
+       discoveryActor ! cmd
+     case query:GetResource =>
+       discoveryActor ask query pipeTo sender
      case ConnectedToMQTT=>
            log.debug("Waiting to reconnect")
           context become liveConsume
