@@ -12,7 +12,7 @@ import net.ceedubs.ficus.Ficus._
 import scala.concurrent.duration._
 import akka.persistence.{SnapshotMetadata, PersistentActor, RecoveryCompleted, SnapshotOffer}
 import java.security.MessageDigest
-
+import net.sigusr.mqtt.api._
 
 case object DiscoveryState {
   val allServices = Map[String, SwitchService](
@@ -135,6 +135,7 @@ class DiscoveryActor(queue: String, _supervisor: ActorRef) extends PersistentAct
     case Connected ⇒
       log.debug(s"Succesfully connected to MQTT at $mqttHost:$mqttPort")
       log.debug(s"Ready to publish to topic [ $localPublisher ]")
+      sender() ! Subscribe(Vector(Tuple2("/service/+/data", {AtMostOnce})), 1)
       supervisor ! ConnectedToMQTT
       context become ready(sender)
     case ConnectionFailure(reason) ⇒
@@ -166,6 +167,11 @@ class DiscoveryActor(queue: String, _supervisor: ActorRef) extends PersistentAct
         Publish(
           s"/service/${serviceRequest.address}/cmd",
           Json.toJson(serviceRequest).toString.getBytes("UTF-8").to[Vector])
+
+    case Message(topic, payload) ⇒
+      val message = new String(payload.to[Array], "UTF-8")
+      println(s"[$topic] $message")
+
   }
 
 }
