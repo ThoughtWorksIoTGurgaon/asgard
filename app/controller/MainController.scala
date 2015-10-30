@@ -16,7 +16,9 @@ class MainController(val discoverySupervisor: ActorRef) extends Controller {
   implicit val akkaTimeout = akka.util.Timeout(1 minute)
 
   def getUnassignedServicesAction = Action.async {
-    val getUntaggedServices = discoverySupervisor.ask(DiscoverySupervisor.GetUntaggedServices).mapTo[List[SwitchService]]
+    val getUntaggedServices = discoverySupervisor
+      .ask(DiscoverySupervisor.GetUntaggedServices)
+      .mapTo[List[SwitchService]]
     getUntaggedServices.map {
       services =>
         Ok(Json.obj("services" -> Json.toJson(services)))
@@ -35,7 +37,7 @@ class MainController(val discoverySupervisor: ActorRef) extends Controller {
 
   def addApplianceAction() = Action(parse.json) {
     request =>
-      println(s"Got some request!! ${request.body}")
+      println(s"addApplianceAction got some request!! ${request.body}")
       request.body.validate[Appliance].map {
         appliance =>
           discoverySupervisor ! ApplianceAdded(appliance)
@@ -46,7 +48,7 @@ class MainController(val discoverySupervisor: ActorRef) extends Controller {
 
   def updateApplianceAction() = Action(parse.json) {
     request =>
-      println(s"Got some request!! ${request.body}")
+      println(s"updateApplianceAction got some request!! ${request.body}")
       request.body.validate[Appliance].map {
         appliance =>
           discoverySupervisor ! ApplianceConfigured(appliance)

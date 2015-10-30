@@ -46,9 +46,11 @@ angular.module('cloudStoreClient')
         return newServices[service.address];
     });
 
+    var applianceServiceUrl = $scope.appliance ? '/appliances/update' : '/appliances/add';
+
     $http({
         method: 'POST',
-        url: '/appliances/add',
+        url: applianceServiceUrl,
         data: JSON.stringify(appliance)
     });
   };

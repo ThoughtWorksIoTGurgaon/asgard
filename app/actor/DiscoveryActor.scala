@@ -15,35 +15,57 @@ import java.security.MessageDigest
 
 
 case object DiscoveryState {
-  val dummyUntaggedServices = List(
-    SwitchService("1","address:myid1","Fan","on")
-    ,SwitchService("2","address:myid2","Tubelight","on")
-    ,SwitchService("3","address:myid3","Monitor","on"))
-  val dummyUntaggedServices2 = List(
-    SwitchService("5","address:myid1","awesome","on")
-    ,SwitchService("6","address:myid2","awesomer","on")
-    ,SwitchService("7","address:myid3","awesomest","off"))
+  val allServices = Map[String, SwitchService](
+    "address:myid1" -> SwitchService("1","address:myid1","Fan","on")
+    , "address:myid2"-> SwitchService("2","address:myid2","Tubelight","on")
+    , "address:myid3" -> SwitchService("3","address:myid3","Monitor","on")
+  )
+
+  val dummyUntaggedServices = Set(
+    allServices("address:myid2")
+  )
+
   val dummyAppliances = List(
-  Appliance(Some("1"),Some("AwesomeAppliance"),Some("AwesomeDescription"),dummyUntaggedServices2)
+    Appliance(
+      Some("1"),
+      Some("AwesomeAppliance"),
+      Some("AwesomeDescription"),
+      List(
+        allServices("address:myid1")
+      , allServices("address:myid3")
+      )
+    )
   )
 }
 
-case class DiscoveryState(appliances: List[Appliance] = DiscoveryState.dummyAppliances, untaggedServices: List[Service] = DiscoveryState.dummyUntaggedServices) {
+case class DiscoveryState(
+  appliances: List[Appliance] = DiscoveryState.dummyAppliances,
+  allServices: Map[String, SwitchService] = DiscoveryState.allServices,
+  untaggedServices: Set[SwitchService] = DiscoveryState.dummyUntaggedServices
+) {
   def updated(evt: DiscoveryEvent): DiscoveryState = {
     evt match {
       case ApplianceAdded(appliance) =>
         val uniqueId = appliance.services.foldLeft(""){(a,switch) => a + switch.id}
-        copy(appliance.copy(id = Some(sha(uniqueId))) :: appliances, untaggedServices.diff(appliance.services))
-      case ApplianceConfigured(newAppliance) =>
+
+        copy(
+          appliance.copy(id = Some(sha(uniqueId))) :: appliances,
+          allServices,
+          untaggedServices -- appliance.services
+        )
+
+      case ApplianceConfigured(updatedAppliance) =>
+        val applianceToUpdate = appliances.find(_.id == updatedAppliance.id).get
         copy(
           appliances
-            .filter(_.id != newAppliance.id) :+ newAppliance
-          ,untaggedServices
-            .filter(s => newAppliance.services.exists(_.id == s.id)))
+            .filter(_.id != updatedAppliance.id) :+ updatedAppliance,
+          allServices,
+          (untaggedServices ++ applianceToUpdate.services) -- updatedAppliance.services
+        )
       case ApplianceDeleted(app) =>
-        copy(appliances.filter(_.id == app.id), untaggedServices ::: app.services)
+        copy(appliances.filter(_.id == app.id), allServices, untaggedServices ++ app.services)
       case ServiceDiscovered(service) =>
-        copy(appliances, untaggedServices :+ service)
+        copy(appliances, allServices, untaggedServices + service)
     }
   }
 
@@ -84,11 +106,11 @@ class DiscoveryActor(queue: String, _supervisor: ActorRef) extends PersistentAct
   def init() = {
     log.debug(
       s"------------------------------------------------------" +
-        s"Starting ${self.path.name} with the following configuration: " +
+        s"\nStarting ${self.path.name} with the following configuration: " +
         s"\nmqttHost: $mqttHost" +
         s"\nmqttPort: $mqttPort" +
         s"\nreconnectInterval: $mqttAutoReconnectIntervalDuration" +
-        s"------------------------------------------------------")
+        s"\n------------------------------------------------------")
     
   }
   
@@ -104,8 +126,9 @@ class DiscoveryActor(queue: String, _supervisor: ActorRef) extends PersistentAct
 
   override def receiveCommand: Receive = {
     case GetUntaggedServices =>
-      log.debug(s"${self.path.name} - Replying with untagged services : ${state.untaggedServices}")
-      sender ! state.untaggedServices
+      val untaggedServices = state.untaggedServices.toList
+      log.debug(s"${self.path.name} - Replying with untagged services : $untaggedServices")
+      sender ! untaggedServices
     case GetAppliances =>
       log.debug(s"${self.path.name} - Replying with list of appliances : ${state.appliances}")
       sender ! state.appliances
@@ -129,8 +152,9 @@ class DiscoveryActor(queue: String, _supervisor: ActorRef) extends PersistentAct
       log.debug(s"${self.path.name} - Got discovery event")
       persist(event)(updateState)
     case GetUntaggedServices =>
-      log.debug(s"${self.path.name} - Replying with untagged services : ${state.untaggedServices}")
-      sender ! state.untaggedServices
+      val untaggedServices = state.untaggedServices.toList
+      log.debug(s"${self.path.name} - Replying with untagged services : $untaggedServices")
+      sender ! untaggedServices
     case GetAppliances =>
       log.debug(s"${self.path.name} - Replying with list of appliances : ${state.appliances}")
       sender ! state.appliances
