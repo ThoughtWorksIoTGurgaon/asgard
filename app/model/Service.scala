@@ -1,44 +1,38 @@
 package model
 
-import play.api.libs.json.{Writes, JsPath, Reads, Json}
+import play.api.libs.json.Json
 
-import scalaz.Alpha.A
-
-
-abstract class Service{
-	def updateStatus(value: String) : ServiceRequest
-	def id: String
+trait Profile{
+	def updateStatus(request: String, data: String) : ServiceRequest
 }
 
-case class SwitchService(
-	val id: String,
-	val address: String,
-	val label: String,
-	val value: String
-) extends Service{
+trait SwitchProfile extends Profile{
 	val widget = "radio-button"
 
-	override def updateStatus(value: String): ServiceRequest = {
-		if (value == "on")
-			return new ServiceRequest(address, "switch-on", "")
+	def processValue(value: String): ServiceRequest = {
+		updateStatus(if (value == "on") "switch-on" else  "switch-off", "")
+	}
+}
 
+
+trait SpeedProfile extends Profile{
+	val widget = "number-field"
+
+	def processValue(value: String): ServiceRequest = {
+		updateStatus("change-speed", value)
+	}
+}
+
+case class Service(
+	address: String,
+	label: String,
+	value: String
+) extends Profile{
+	override def updateStatus(request: String, data: String) : ServiceRequest = {
 		new ServiceRequest(address, "switch-off", "")
 	}
 }
 
-object SwitchService{
-	implicit val switchServiceFormat = Json.format[SwitchService]
-}
-
-case class SpeedService(
-	val id: String,
-	val address: String,
-	val label: String,
-	val value: String
-) extends Service{
-	val widget = "number-field"
-
-	override def updateStatus(value: String): ServiceRequest = {
-		new ServiceRequest(address, "change-speed", value)
-	}
+object Service{
+	implicit val serviceFormat = Json.format[Service]
 }

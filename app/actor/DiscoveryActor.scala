@@ -4,7 +4,7 @@ import java.net.{ InetAddress, InetSocketAddress }
 import actor.DiscoverySupervisor._
 import akka.actor.ActorRef
 import com.typesafe.config.{ Config, ConfigFactory }
-import model.{SwitchService, Service, Appliance}
+import model.{Service, Appliance}
 import net.sigusr.mqtt.api.{ Connect, Connected, ConnectionFailure, Manager, Publish }
 import play.api.{ Logger, Play }
 import play.api.libs.json.Json
@@ -15,10 +15,10 @@ import java.security.MessageDigest
 import net.sigusr.mqtt.api._
 
 case object DiscoveryState {
-  val allServices = Map[String, SwitchService](
-    "address:myid1" -> SwitchService("1","address:myid1","Fan","on")
-    , "address:myid2"-> SwitchService("2","address:myid2","Tubelight","on")
-    , "address:myid3" -> SwitchService("3","address:myid3","Monitor","on")
+  val allServices = Map[String, Service](
+    "address:myid1" -> Service("address:myid1","Fan","on")
+    , "address:myid2"-> Service("address:myid2","Tubelight","on")
+    , "address:myid3" -> Service("address:myid3","Monitor","on")
   )
 
   val dummyUntaggedServices = Set(
@@ -40,13 +40,13 @@ case object DiscoveryState {
 
 case class DiscoveryState(
   appliances: List[Appliance] = DiscoveryState.dummyAppliances,
-  allServices: Map[String, SwitchService] = DiscoveryState.allServices,
-  untaggedServices: Set[SwitchService] = DiscoveryState.dummyUntaggedServices
+  allServices: Map[String, Service] = DiscoveryState.allServices,
+  untaggedServices: Set[Service] = DiscoveryState.dummyUntaggedServices
 ) {
   def updated(evt: DiscoveryEvent): DiscoveryState = {
     evt match {
       case ApplianceAdded(appliance) =>
-        val uniqueId = appliance.services.foldLeft(""){(a,switch) => a + switch.id}
+        val uniqueId = appliance.services.foldLeft(""){(a,switch) => a + switch.address}
 
         copy(
           appliance.copy(id = Some(sha(uniqueId))) :: appliances,

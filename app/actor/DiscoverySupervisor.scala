@@ -2,12 +2,12 @@ package actor
 
 import akka.actor.Actor
 import akka.actor.OneForOneStrategy
-import akka.actor.SupervisorStrategy._
+import akka.actor.SupervisorStrategy.Restart
 import scala.concurrent.duration._
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import akka.actor.Props
 import akka.pattern.{ ask, pipe }
-import model.{SwitchService, Service, Appliance, ServiceRequest}
+import model.{Service, Appliance, ServiceRequest}
 import actor.DiscoverySupervisor._
 import play.api.Logger
 
@@ -80,7 +80,7 @@ object DiscoverySupervisor {
   case class ApplianceAdded(appliance: Appliance) extends DiscoveryEvent with Command
   case class ApplianceConfigured(appliance: Appliance) extends DiscoveryEvent with Command 
   case class ApplianceDeleted(appliance: Appliance) extends DiscoveryEvent with Command 
-  case class ServiceDiscovered(service: SwitchService) extends DiscoveryEvent
+  case class ServiceDiscovered(service: Service) extends DiscoveryEvent
   case class ServiceUpdated(service: Service) extends DiscoveryEvent
 
 

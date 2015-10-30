@@ -18,7 +18,7 @@ class MainController(val discoverySupervisor: ActorRef) extends Controller {
   def getUnassignedServicesAction = Action.async {
     val getUntaggedServices = discoverySupervisor
       .ask(DiscoverySupervisor.GetUntaggedServices)
-      .mapTo[List[SwitchService]]
+      .mapTo[List[Service]]
     getUntaggedServices.map {
       services =>
         Ok(Json.obj("services" -> Json.toJson(services)))
