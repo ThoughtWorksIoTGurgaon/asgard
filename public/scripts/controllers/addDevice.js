@@ -17,7 +17,7 @@ angular.module('cloudStoreClient')
         templateUrl: 'myModalContent.html',
         controller: 'ModalInstanceCtrl',
         resolve: {
-            appliance : function(){return selectedAppliance}
+            selectedAppliance : function(){return selectedAppliance}
         }
     });
   };
@@ -25,10 +25,10 @@ angular.module('cloudStoreClient')
 
 
 angular.module('cloudStoreClient')
-    .controller('ModalInstanceCtrl', function ($scope, $modalInstance, $http, appliance) {
+    .controller('ModalInstanceCtrl', function ($scope, $modalInstance, $http, selectedAppliance) {
 
-  $scope.allServices = appliance && appliance.services || [];
-  $scope.appliance = appliance;
+  $scope.allServices = selectedAppliance && selectedAppliance.services || [];
+  $scope.appliance = selectedAppliance;
 
   $scope.newServices = {};
   $scope.allServices.forEach(function(service){
@@ -46,7 +46,7 @@ angular.module('cloudStoreClient')
         return newServices[service.address];
     });
 
-    var applianceServiceUrl = $scope.appliance ? '/appliances/update' : '/appliances/add';
+    var applianceServiceUrl = selectedAppliance ? '/appliances/update' : '/appliances/add';
 
     $http({
         method: 'POST',
