@@ -1,0 +1,7 @@
+<div class="togglebutton" id="{{service.address}}">
+    <label>
+        {{service.label}}
+        <input type="checkbox" ng-model="service.value" ng-change="changeState(service)" ng-true-value="'on'" ng-false-value="'off'">
+        <span class="toggle"></span>
+    </label>
+</div>

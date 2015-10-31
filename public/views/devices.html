@@ -19,13 +19,8 @@
                 <h3>Controls</h3>
                 <ul class="list-unstyled indent">
                   <li ng-repeat="service in appliance.services">
-                    <div class="togglebutton" id="{{service.address}}">
-                      <label>
-                        <input type="checkbox" ng-model="service.value" ng-change="changeState(service)" ng-true-value="'on'" ng-false-value="'off'">
-                        <span class="toggle"></span>
-                          {{service.label}}
-                      </label>
-                    </div>
+                    <toggle-button service="service" ng-if="service.widget == 'toggle-button'"></toggle-button>
+                    <range-slider service="service" ng-if="service.widget == 'range-slider'"></range-slider>
                   </li>
                 </ul>
               </div>

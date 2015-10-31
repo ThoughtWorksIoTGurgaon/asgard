@@ -7,29 +7,33 @@ trait Profile{
 }
 
 trait SwitchProfile extends Profile{
-	val widget = "radio-button"
-
 	def processValue(value: String): ServiceRequest = {
 		updateStatus(if (value == "on") "switch-on" else  "switch-off", "")
 	}
 }
 
+object SwitchProfile{
+	val widget = "toggle-button"
+}
 
 trait SpeedProfile extends Profile{
-	val widget = "number-field"
-
 	def processValue(value: String): ServiceRequest = {
 		updateStatus("change-speed", value)
 	}
 }
 
+object SpeedProfile{
+	val widget = "range-slider"
+}
+
 case class Service(
 	address: String,
 	label: String,
-	value: String
+	value: String,
+	widget: String
 ) extends Profile{
 	override def updateStatus(request: String, data: String) : ServiceRequest = {
-		new ServiceRequest(address, "switch-off", "")
+		new ServiceRequest(address, request, data)
 	}
 }
 

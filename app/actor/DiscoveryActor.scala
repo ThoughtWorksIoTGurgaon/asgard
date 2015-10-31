@@ -4,21 +4,21 @@ import java.net.{ InetAddress, InetSocketAddress }
 import actor.DiscoverySupervisor._
 import akka.actor.ActorRef
 import com.typesafe.config.{ Config, ConfigFactory }
-import model.{Service, Appliance}
+import model.{SpeedProfile, SwitchProfile, Service, Appliance}
 import net.sigusr.mqtt.api.{ Connect, Connected, ConnectionFailure, Manager, Publish }
-import play.api.{ Logger, Play }
+import play.api.Logger
 import play.api.libs.json.Json
 import net.ceedubs.ficus.Ficus._
 import scala.concurrent.duration._
-import akka.persistence.{SnapshotMetadata, PersistentActor, RecoveryCompleted, SnapshotOffer}
+import akka.persistence.{PersistentActor, RecoveryCompleted, SnapshotOffer}
 import java.security.MessageDigest
 import net.sigusr.mqtt.api._
 
 case object DiscoveryState {
   val allServices = Map[String, Service](
-    "address:myid1" -> Service("address:myid1","Fan","on")
-    , "address:myid2"-> Service("address:myid2","Tubelight","on")
-    , "address:myid3" -> Service("address:myid3","Monitor","on")
+    "address:myid1" -> new Service("address:myid1","Fan","on", SpeedProfile.widget) with SpeedProfile
+    , "address:myid2"-> new Service("address:myid2","Tubelight","on", SwitchProfile.widget) with SwitchProfile
+    , "address:myid3" -> new Service("address:myid3","Monitor","on", SwitchProfile.widget) with SwitchProfile
   )
 
   val dummyUntaggedServices = Set(
