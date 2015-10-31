@@ -16,6 +16,7 @@ trait SwitchProfile extends Profile{
 }
 
 object SwitchProfile{
+	val id = "SWH"
 	val widget = "toggle-button"
 }
 
@@ -26,6 +27,7 @@ trait SpeedProfile extends Profile{
 }
 
 object SpeedProfile{
+	val id = "SPE"
 	val widget = "range-slider"
 }
 

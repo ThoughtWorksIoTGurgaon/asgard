@@ -185,8 +185,15 @@ class DiscoveryActor(queue: String, _supervisor: ActorRef) extends PersistentAct
       val newServices = Json.parse(message).validate[ServiceResponse].map{
         serviceResponse =>
           serviceResponse.data.map{
-            serviceProfile =>
-              new Service(serviceProfile.address, serviceProfile.profileId, "", "")
+            serviceProfile => serviceProfile.profileId match {
+              case SwitchProfile.id =>
+                new Service(serviceProfile.address, serviceProfile.profileId, "", SwitchProfile.widget)
+                  with SwitchProfile
+
+              case SpeedProfile.id =>
+                new Service(serviceProfile.address, serviceProfile.profileId, "", SpeedProfile.widget)
+                  with SpeedProfile
+            }
           }
       }
 
