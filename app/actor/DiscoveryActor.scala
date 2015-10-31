@@ -4,7 +4,7 @@ import java.net.{ InetAddress, InetSocketAddress }
 import actor.DiscoverySupervisor._
 import akka.actor.ActorRef
 import com.typesafe.config.{ Config, ConfigFactory }
-import model.{SpeedProfile, SwitchProfile, Service, Appliance}
+import model._
 import net.sigusr.mqtt.api.{ Connect, Connected, ConnectionFailure, Manager, Publish }
 import play.api.Logger
 import play.api.libs.json.Json
@@ -64,8 +64,15 @@ case class DiscoveryState(
         )
       case ApplianceDeleted(app) =>
         copy(appliances.filter(_.id == app.id), allServices, untaggedServices ++ app.services)
-      case ServiceDiscovered(service) =>
-        copy(appliances, allServices, untaggedServices + service)
+      case ServiceDiscovered(services) =>
+
+        val newServices = services.filter(service => !(allServices contains service.address))
+
+        val servicesMap = newServices.map{
+          service => (service.address, service)
+        }.toMap[String, Service]
+
+        copy(appliances, allServices ++ servicesMap, untaggedServices ++ newServices)
     }
   }
 
@@ -161,20 +168,29 @@ class DiscoveryActor(queue: String, _supervisor: ActorRef) extends PersistentAct
       sender ! state.appliances
     case Snap => saveSnapshot(state)
     case UpdateDeviceState(widgetStatus) ⇒
-      val serviceProfile = state.allServices.get(widgetStatus.address).get
-      val serviceRequest = serviceProfile.processWidget(widgetStatus)
+      val service = state.allServices.get(widgetStatus.address).get
+      val serviceRequest = service.processWidget(widgetStatus)
 
       log.debug(s"Sending service ${serviceRequest.address}, ${serviceRequest.request}, ${serviceRequest.data}")
 
       mqttManager !
         Publish(
           s"/service/${serviceRequest.address}/cmd",
-          Json.toJson(serviceRequest).toString.getBytes("UTF-8").to[Vector])
+          Json.toJson(serviceRequest).toString().getBytes("UTF-8").to[Vector])
 
     case Message(topic, payload) ⇒
       val message = new String(payload.to[Array], "UTF-8")
       println(s"[$topic] $message")
 
+      val newServices = Json.parse(message).validate[ServiceResponse].map{
+        serviceResponse =>
+          serviceResponse.data.map{
+            serviceProfile =>
+              new Service(serviceProfile.address, serviceProfile.profileId, "", "")
+          }
+      }
+
+      updateState(new ServiceDiscovered(newServices.get))
   }
 
 }
