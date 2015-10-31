@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('cloudStoreClient')
-    .controller('AddDeviceCtrl', function ($scope,$http,$modal) {
+    .controller('ManageApplianceCtrl', function ($scope,$http,$modal) {
   $scope.loadAvailableServices = function() {
     $http.get('/appliances').then(function(response) {
       $scope.appliances = response.data.appliances;

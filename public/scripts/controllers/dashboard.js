@@ -13,7 +13,7 @@ var updateServiceValue = function($service) {
 };
 
 angular.module('cloudStoreClient')
-  .controller('DevicesCtrl', function ($scope,$http) {
+  .controller('DashboardCtrl', function ($scope,$http) {
     $scope.status=true;
     $scope.oneAtATime = true;
     $scope.loadAppliances = function(){
