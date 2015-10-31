@@ -5,6 +5,7 @@ import actor.DiscoverySupervisor._
 import akka.actor.ActorRef
 import com.typesafe.config.{ Config, ConfigFactory }
 import model._
+import model.profile._
 import net.sigusr.mqtt.api.{ Connect, Connected, ConnectionFailure, Manager, Publish }
 import play.api.Logger
 import play.api.libs.json.Json
@@ -62,10 +63,11 @@ case class DiscoveryState(
           allServices,
           (untaggedServices ++ applianceToUpdate.services) -- updatedAppliance.services
         )
+
       case ApplianceDeleted(app) =>
         copy(appliances.filter(_.id == app.id), allServices, untaggedServices ++ app.services)
-      case ServiceDiscovered(services) =>
 
+      case ServiceDiscovered(services) =>
         val newServices = services.filter(service => !(allServices contains service.address))
 
         val servicesMap = newServices.map{
@@ -182,22 +184,31 @@ class DiscoveryActor(queue: String, _supervisor: ActorRef) extends PersistentAct
       val message = new String(payload.to[Array], "UTF-8")
       println(s"[$topic] $message")
 
-      val newServices = Json.parse(message).validate[ServiceResponse].map{
-        serviceResponse =>
-          serviceResponse.data.map{
-            serviceProfile => serviceProfile.profileId match {
-              case SwitchProfile.id =>
-                new Service(serviceProfile.address, serviceProfile.profileId, "", SwitchProfile.widget)
-                  with SwitchProfile
+      val addressParserRegex = """^/service/([^/]+)/data$""".r
 
-              case SpeedProfile.id =>
-                new Service(serviceProfile.address, serviceProfile.profileId, "", SpeedProfile.widget)
-                  with SpeedProfile
-            }
+      topic match {
+        case addressParserRegex(address) =>
+          Json.parse(message).validate[ServiceResponse].map{
+            serviceResponse =>
+              val service =
+                if(state.allServices contains address){
+                  state.allServices get address get
+                } else if (serviceResponse.response == "discover-service") {
+                  val deviceService = new Service(address, "Device", "some", "device") with DeviceProfile
+                  updateState(new ServiceDiscovered(deviceService +: List.empty))
+                  deviceService
+                }
+
+              service match {
+                case _:DeviceProfile =>
+                  service.asInstanceOf[DeviceProfile].processResponse(
+                    serviceResponse,
+                    newServices => updateState(new ServiceDiscovered(newServices.asInstanceOf[List[Service]]))
+                  )
+                case _:Profile =>
+                  service.asInstanceOf[Profile].processResponse(serviceResponse)
+              }
           }
       }
-
-      updateState(new ServiceDiscovered(newServices.get))
   }
-
 }
