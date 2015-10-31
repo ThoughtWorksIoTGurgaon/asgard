@@ -6,7 +6,9 @@ var updateServiceValue = function($service) {
     return $.ajax({
         type: "POST",
         url: '/services/value',
-        data: postData
+        data: postData,
+        dataType: "json",
+        contentType: "application/json; charset=utf-8"
     });
 };
 

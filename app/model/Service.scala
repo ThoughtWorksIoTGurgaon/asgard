@@ -3,12 +3,15 @@ package model
 import play.api.libs.json.Json
 
 trait Profile{
-	def updateStatus(request: String, data: String) : ServiceRequest
+	def processWidget(widgetStatus: WidgetStatus): ServiceRequest
+	protected def updateStatus(address: String, request: String, data: String) : ServiceRequest = {
+		new ServiceRequest(address, request, data)
+	}
 }
 
 trait SwitchProfile extends Profile{
-	def processValue(value: String): ServiceRequest = {
-		updateStatus(if (value == "on") "switch-on" else  "switch-off", "")
+	override def processWidget(widgetStatus: WidgetStatus): ServiceRequest = {
+		updateStatus(widgetStatus.address, if (widgetStatus.value == "on") "switch-on" else  "switch-off", "")
 	}
 }
 
@@ -17,8 +20,8 @@ object SwitchProfile{
 }
 
 trait SpeedProfile extends Profile{
-	def processValue(value: String): ServiceRequest = {
-		updateStatus("change-speed", value)
+	override def processWidget(widgetStatus: WidgetStatus): ServiceRequest = {
+		updateStatus(widgetStatus.address, "change-speed", widgetStatus.value)
 	}
 }
 
@@ -32,8 +35,8 @@ case class Service(
 	value: String,
 	widget: String
 ) extends Profile{
-	override def updateStatus(request: String, data: String) : ServiceRequest = {
-		new ServiceRequest(address, request, data)
+	override def processWidget(widgetStatus: WidgetStatus): ServiceRequest = {
+		updateStatus(widgetStatus.address, "default", widgetStatus.value)
 	}
 }
 

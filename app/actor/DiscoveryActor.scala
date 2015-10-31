@@ -160,7 +160,10 @@ class DiscoveryActor(queue: String, _supervisor: ActorRef) extends PersistentAct
       log.debug(s"${self.path.name} - Replying with list of appliances : ${state.appliances}")
       sender ! state.appliances
     case Snap => saveSnapshot(state)
-    case UpdateDeviceState(serviceRequest) ⇒
+    case UpdateDeviceState(widgetStatus) ⇒
+      val serviceProfile = state.allServices.get(widgetStatus.address).get
+      val serviceRequest = serviceProfile.processWidget(widgetStatus)
+
       log.debug(s"Sending service ${serviceRequest.address}, ${serviceRequest.request}, ${serviceRequest.data}")
 
       mqttManager !

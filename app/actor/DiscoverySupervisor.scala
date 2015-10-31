@@ -7,7 +7,7 @@ import scala.concurrent.duration._
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import akka.actor.Props
 import akka.pattern.{ ask, pipe }
-import model.{Service, Appliance, ServiceRequest}
+import model.{WidgetStatus, Service, Appliance, ServiceRequest}
 import actor.DiscoverySupervisor._
 import play.api.Logger
 
@@ -81,7 +81,6 @@ object DiscoverySupervisor {
   case class ApplianceConfigured(appliance: Appliance) extends DiscoveryEvent with Command 
   case class ApplianceDeleted(appliance: Appliance) extends DiscoveryEvent with Command 
   case class ServiceDiscovered(service: Service) extends DiscoveryEvent
-  case class ServiceUpdated(service: Service) extends DiscoveryEvent
 
 
   trait GetResource
@@ -90,5 +89,5 @@ object DiscoverySupervisor {
 
 
  
-  case class UpdateDeviceState(serviceRequest: ServiceRequest) extends Command
+  case class UpdateDeviceState(widgetStatus: WidgetStatus) extends Command
 }

@@ -55,4 +55,14 @@ class MainController(val discoverySupervisor: ActorRef) extends Controller {
           Ok("")
       }.recoverTotal(e=>BadRequest(s"Bad request $e"))
   }
+
+  def updateServiceValue() = Action(parse.json) {
+    request =>
+      println(s"updateServiceValue got some request!! ${request.body}")
+      request.body.validate[WidgetStatus].map {
+        widgetStatus =>
+          discoverySupervisor ! UpdateDeviceState(widgetStatus)
+          Ok("")
+      }.recoverTotal(e=>BadRequest(s"Bad request $e"))
+  }
 }
