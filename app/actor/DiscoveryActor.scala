@@ -138,15 +138,23 @@ class DiscoveryActor(queue: String, _supervisor: ActorRef) extends PersistentAct
       val untaggedServices = state.untaggedServices.toList
       log.debug(s"${self.path.name} - Replying with untagged services : $untaggedServices")
       sender ! untaggedServices
+
+    case GetAllServices =>
+      val allServices = state.allServices.values.toList
+      log.debug(s"${self.path.name} - Replying with all services : $allServices")
+      sender ! allServices
+
     case GetAppliances =>
       log.debug(s"${self.path.name} - Replying with list of appliances : ${state.appliances}")
       sender ! state.appliances
+
     case Connected ⇒
       log.debug(s"Succesfully connected to MQTT at $mqttHost:$mqttPort")
       log.debug(s"Ready to publish to topic [ $localPublisher ]")
       sender() ! Subscribe(Vector(Tuple2("/service/+/data", {AtMostOnce})), 1)
       supervisor ! ConnectedToMQTT
       context become ready(sender)
+
     case ConnectionFailure(reason) ⇒
       log.debug(s"Connection to $mqttHost:$mqttPort [$reason] - trying reconnect in $mqttAutoReconnectIntervalDuration")
       context.system.scheduler.scheduleOnce(mqttAutoReconnectIntervalDuration, mqttManager, Connect(localPublisher))
@@ -161,14 +169,23 @@ class DiscoveryActor(queue: String, _supervisor: ActorRef) extends PersistentAct
     case event:DiscoveryEvent =>
       log.debug(s"${self.path.name} - Got discovery event")
       persist(event)(updateState)
+
     case GetUntaggedServices =>
       val untaggedServices = state.untaggedServices.toList
       log.debug(s"${self.path.name} - Replying with untagged services : $untaggedServices")
       sender ! untaggedServices
+
+    case GetAllServices =>
+      val allServices = state.allServices.values
+      log.debug(s"${self.path.name} - Replying with all services : $allServices")
+      sender ! allServices
+
     case GetAppliances =>
       log.debug(s"${self.path.name} - Replying with list of appliances : ${state.appliances}")
       sender ! state.appliances
+
     case Snap => saveSnapshot(state)
+
     case UpdateDeviceState(widgetStatus) ⇒
       val service = state.allServices.get(widgetStatus.address).get
       val serviceRequest = service.processWidget(widgetStatus)

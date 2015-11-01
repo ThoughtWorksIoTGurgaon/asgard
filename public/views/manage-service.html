@@ -1,0 +1,51 @@
+<div ng-init="loadAllServices()">
+    <div class="row-fluid">
+        <div class="span4">
+            <h1>Manage services</h1>
+        </div>
+    </div>
+
+    <script type="text/ng-template" id="serviceEditModal.html">
+        <div class="modal-header">
+            <h3 class="modal-title">Edit service</h3>
+        </div>
+        <div class="modal-body service-edit-modal">
+            <form class="form-horizontal">
+                <fieldset>
+                    <div class="form-group">
+                        <label for="serviceLabel" class="col-lg-3 control-label">Service Label</label>
+                        <div class="col-lg-9">
+                            <input type="text" class="form-control" id="serviceLabel" placeholder="Service label" ng-model="service.label">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="serviceAddress" class="col-lg-3 control-label">Service Address</label>
+                        <div class="col-lg-9">
+                            <input disabled type="text" class="form-control" id="serviceAddress" placeholder="Service address" ng-model="service.address">
+                        </div>
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-primary" type="button" ng-click="submit(service)">Submit</button>
+            <button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
+        </div>
+    </script>
+
+    <div ng-show="services.length > 0">
+        <div class="panel panel-default" ng-repeat="service in services">
+            <div class="panel-body">
+                <h4 class="inline">{{service.label}} - {{service.address}}</h4>
+                <a href="javascript:;">
+                    <button ng-click="editServiceModal({{service}})" class="btn btn-default btn-fab btn-fab-mini pull-right btn-success mdi-image-edit btn-xs"></button>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div ng-hide="services.length > 0">
+        No appliances found
+    </div>
+</div>
+
+

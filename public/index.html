@@ -35,18 +35,14 @@
               <span class="icon-bar"></span>
             </button>
 
-	    <div class="collapse navbar-collapse">
-	      <ul class="nav navbar-nav" ng-controller="HeaderController">
-		      <li ng-class="{ active: isActive('/')}"><a href="#/">Appliances</a></li>
-		      <li ng-class="{ active: isActive('/manage-appliance')}"><a href="#/manage-appliance">Manage appliance</a></li>
-	      </ul>
-	    </div>
+            <div class="collapse navbar-collapse" id="js-navbar-collapse">
+              <ul class="nav navbar-nav" ng-controller="HeaderController">
+                  <li ng-class="{ active: isActive('/')}"><a href="#/">Appliances</a></li>
+                  <li ng-class="{ active: isActive('/manage-appliance')}"><a href="#/manage-appliance">Manage appliance</a></li>
+                  <li ng-class="{ active: isActive('/manage-service')}"><a href="#/manage-service">Manage service</a></li>
+              </ul>
+            </div>
 
-          </div>
-
-          <div class="collapse navbar-collapse" id="js-navbar-collapse">
-            <ul class="nav navbar-nav">
-            </ul>
           </div>
         </div>
       </nav>
@@ -86,6 +82,7 @@
     <script src="scripts/app.js"></script>
     <script src="scripts/controllers/dashboard.js"></script>
     <script src="scripts/controllers/mange-appliance.js"></script>
+    <script src="scripts/controllers/manage-service.js"></script>
     <!-- endbuild -->
 
   </body>

@@ -56,7 +56,7 @@ class MainController(val discoverySupervisor: ActorRef) extends Controller {
       }.recoverTotal(e=>BadRequest(s"Bad request $e"))
   }
 
-  def updateServiceValue() = Action(parse.json) {
+  def updateServiceValueAction() = Action(parse.json) {
     request =>
       println(s"updateServiceValue got some request!! ${request.body}")
       request.body.validate[WidgetStatus].map {
@@ -64,5 +64,15 @@ class MainController(val discoverySupervisor: ActorRef) extends Controller {
           discoverySupervisor ! UpdateDeviceState(widgetStatus)
           Ok("")
       }.recoverTotal(e=>BadRequest(s"Bad request $e"))
+  }
+
+  def getAllServicesAction = Action.async {
+    val getAllServices = discoverySupervisor
+      .ask(DiscoverySupervisor.GetAllServices)
+      .mapTo[List[Service]]
+    getAllServices.map {
+      services =>
+        Ok(Json.obj("services" -> Json.toJson(services)))
+    }
   }
 }

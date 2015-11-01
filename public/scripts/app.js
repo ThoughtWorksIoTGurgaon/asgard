@@ -31,6 +31,11 @@ angular
         controller: 'ManageApplianceCtrl',
         controllerAs: 'manageApplianceCtrl'
       })
+      .when('/manage-service', {
+        templateUrl: 'views/manage-service.html',
+        controller: 'ManageServiceCtrl',
+        controllerAs: 'manageServiceCtrl'
+      })
       .otherwise({
         redirectTo: '/'
       });

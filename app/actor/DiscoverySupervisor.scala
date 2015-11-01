@@ -86,6 +86,7 @@ object DiscoverySupervisor {
   trait GetResource
   case object GetUntaggedServices extends GetResource
   case object GetAppliances extends GetResource
+  case object GetAllServices extends GetResource
 
 
  
