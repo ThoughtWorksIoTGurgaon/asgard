@@ -176,7 +176,7 @@ class DiscoveryActor(queue: String, _supervisor: ActorRef) extends PersistentAct
       sender ! untaggedServices
 
     case GetAllServices =>
-      val allServices = state.allServices.values
+      val allServices = state.allServices.values.toList
       log.debug(s"${self.path.name} - Replying with all services : $allServices")
       sender ! allServices
 

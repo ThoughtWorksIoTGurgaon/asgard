@@ -58,6 +58,8 @@ angular.module('cloudStoreClient')
                   }
               );
 
+              sliderElement.noUiSlider.set(parseInt(scope.service.value));
+
               sliderElement.noUiSlider.on('change', function(){
                   scope.service.value = sliderElement.noUiSlider.get();
                   updateServiceValue(scope.service)

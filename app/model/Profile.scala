@@ -6,4 +6,6 @@ trait Profile{
 
   def processResponse(serviceResponse: ServiceResponse, callback: AnyRef => Unit = (_) => Unit) : WidgetStatus
   protected def createWidgetStatus(value: String) : WidgetStatus
+
+  protected def updateValue(value: String)
 }

@@ -5,7 +5,7 @@ import play.api.libs.json.Json
 case class Service(
 	address: String,
 	label: String,
-	value: String,
+	var value: String,
 	widget: String
 ) extends Profile{
 	override def processWidget(widgetStatus: WidgetStatus): ServiceRequest = {
@@ -22,6 +22,10 @@ case class Service(
 
 	override protected def createWidgetStatus(value: String) : WidgetStatus = {
 		new WidgetStatus(address, value)
+	}
+
+	override protected def updateValue(value: String): Unit = {
+		this.value = value
 	}
 }
 
