@@ -80,6 +80,7 @@ object DiscoverySupervisor {
   case class ApplianceAdded(appliance: Appliance) extends DiscoveryEvent with Command
   case class ApplianceConfigured(appliance: Appliance) extends DiscoveryEvent with Command 
   case class ApplianceDeleted(appliance: Appliance) extends DiscoveryEvent with Command 
+  case class ServiceConfigured(service: Service) extends DiscoveryEvent with Command
   case class ServiceDiscovered(services: List[Service]) extends DiscoveryEvent
 
 

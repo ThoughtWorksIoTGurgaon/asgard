@@ -1,7 +1,7 @@
 package controller
 
 import actor.DiscoverySupervisor
-import actor.DiscoverySupervisor.{ApplianceConfigured, ApplianceAdded, UpdateDeviceState}
+import actor.DiscoverySupervisor._
 import akka.actor.ActorRef
 import akka.pattern._
 import scala.concurrent.duration._
@@ -45,6 +45,16 @@ class MainController(val discoverySupervisor: ActorRef) extends Controller {
       }.recoverTotal(e=>BadRequest(s"Bad request $e"))
   }
 
+  def deleteApplianceAction() = Action(parse.json) {
+    request =>
+      println(s"deleteApplianceAction got some request!! ${request.body}")
+      request.body.validate[Appliance].map {
+        appliance =>
+          discoverySupervisor ! ApplianceDeleted(appliance)
+          Ok("")
+      }.recoverTotal(e=>BadRequest(s"Bad request $e"))
+  }
+
 
   def updateApplianceAction() = Action(parse.json) {
     request =>
@@ -52,6 +62,17 @@ class MainController(val discoverySupervisor: ActorRef) extends Controller {
       request.body.validate[Appliance].map {
         appliance =>
           discoverySupervisor ! ApplianceConfigured(appliance)
+          Ok("")
+      }.recoverTotal(e=>BadRequest(s"Bad request $e"))
+  }
+
+
+  def updateServiceAction() = Action(parse.json) {
+    request =>
+      println(s"updateServiceAction got some request!! ${request.body}")
+      request.body.validate[Service].map {
+        service =>
+          discoverySupervisor ! ServiceConfigured(service)
           Ok("")
       }.recoverTotal(e=>BadRequest(s"Bad request $e"))
   }

@@ -16,11 +16,26 @@ angular.module('cloudStoreClient')
         animation: $scope.animationsEnabled,
         templateUrl: 'myModalContent.html',
         controller: 'ModalInstanceCtrl',
+        scope: $scope,
         resolve: {
             selectedAppliance : function(){return selectedAppliance}
         }
     });
   };
+
+  $scope.deleteAppliance = function(selectedAppliance){
+      $http({
+          method: 'POST',
+          url: "/appliances/delete",
+          data: JSON.stringify(selectedAppliance)
+      }).then(function(response){
+          $scope.loadAvailableServices();
+      });
+  };
+
+  $scope.$on("appliance-added", function(event, appliance) {
+      $scope.loadAvailableServices();
+  });
 });
 
 
@@ -52,6 +67,8 @@ angular.module('cloudStoreClient')
         method: 'POST',
         url: applianceServiceUrl,
         data: JSON.stringify(appliance)
+    }).then(function(){
+        $scope.$emit("appliance-added", appliance);
     });
   };
 

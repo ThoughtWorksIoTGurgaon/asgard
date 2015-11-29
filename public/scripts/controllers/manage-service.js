@@ -3,7 +3,7 @@
 angular.module('cloudStoreClient')
     .controller('ManageServiceCtrl', function ($scope,$http,$modal) {
         $scope.loadAllServices = function() {
-            $http.get('/services/all').then(function(response) {
+            $http.get('/services/unassigned').then(function(response) {
                 $scope.services = response.data.services;
             }, function(response) {
                 $scope.services = [];
@@ -16,11 +16,16 @@ angular.module('cloudStoreClient')
                 animation: $scope.animationsEnabled,
                 templateUrl: 'serviceEditModal.html',
                 controller: 'ServiceEditModalCtrl',
+                scope: $scope,
                 resolve: {
                     selectedService : function(){return selectedService}
                 }
             });
         };
+
+        $scope.$on("service-configured", function(event, service) {
+            $scope.loadAllServices();
+        });
     });
 
 
@@ -32,12 +37,14 @@ angular.module('cloudStoreClient')
         $scope.submit = function(service) {
             $modalInstance.close();
 
-            var serviceUrl = selectedService ? '/appliances/update' : '/appliances/add';
+            var serviceUrl = '/services/update';
 
             $http({
                 method: 'POST',
                 url: serviceUrl,
                 data: JSON.stringify(service)
+            }).then(function(){
+                $scope.$emit("service-configured", service);
             });
         };
 

@@ -17,9 +17,9 @@ import net.sigusr.mqtt.api._
 
 case object DiscoveryState {
   val allServices = Map[String, Service](
-    "address:myid1" -> new Service("address:myid1","Fan","on", SpeedProfile.widget) with SpeedProfile
-    , "address:myid2"-> new Service("address:myid2","Tubelight","on", SwitchProfile.widget) with SwitchProfile
-    , "address:myid3" -> new Service("address:myid3","Monitor","on", SwitchProfile.widget) with SwitchProfile
+    "address:myid1" -> new Service("address:myid1","Speed","0", SpeedProfile.widget) with SpeedProfile
+    , "address:myid2"-> new Service("address:myid2","Switch","on", SwitchProfile.widget) with SwitchProfile
+    , "address:myid3" -> new Service("address:myid3","Switch","on", SwitchProfile.widget) with SwitchProfile
   )
 
   val dummyUntaggedServices = Set(
@@ -29,8 +29,8 @@ case object DiscoveryState {
   val dummyAppliances = List(
     Appliance(
       Some("1"),
-      Some("AwesomeAppliance"),
-      Some("AwesomeDescription"),
+      Some("Fan"),
+      Some("Bed room"),
       List(
         allServices("address:myid1")
       , allServices("address:myid3")
@@ -64,8 +64,16 @@ case class DiscoveryState(
           (untaggedServices ++ applianceToUpdate.services) -- updatedAppliance.services
         )
 
-      case ApplianceDeleted(app) =>
-        copy(appliances.filter(_.id == app.id), allServices, untaggedServices ++ app.services)
+      case ApplianceDeleted(appliance) =>
+        copy(appliances.filter(_.id != appliance.id), allServices, untaggedServices ++ appliance.services)
+
+      case ServiceConfigured(service) =>
+        val serviceToUpdate = untaggedServices.find(_.address == service.address).get
+        copy(
+          appliances,
+          allServices + (service.address -> service),
+          (untaggedServices -- Set(serviceToUpdate)) ++ Set(service)
+        )
 
       case ServiceDiscovered(services) =>
         val newServices = services.filter(service => !(allServices contains service.address))
