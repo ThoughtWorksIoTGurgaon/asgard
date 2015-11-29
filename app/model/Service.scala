@@ -1,6 +1,6 @@
 package model
 
-import model.profile.{ServiceProfile, SpeedProfile, SwitchProfile}
+import model.profile.{DistanceProfile, ServiceProfile, SpeedProfile, SwitchProfile}
 import play.api.libs.json.Json
 
 case class Service(
@@ -55,6 +55,9 @@ object Service{
 
 			case SpeedProfile.id =>
 				new Service(address, profileId, "10", SpeedProfile.widget) with SpeedProfile
+
+			case DistanceProfile.id =>
+				new Service(address, profileId, "10", DistanceProfile.widget) with DistanceProfile
 		}
 	}
 

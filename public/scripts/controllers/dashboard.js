@@ -12,6 +12,16 @@ var updateServiceValue = function($service) {
     });
 };
 
+var pollService = function($scope, $http, $interval, milliSeconds){
+    var intervalPromise = $interval(function(){
+        $http.get("/service/" + $scope.service.address)
+            .then(function(response) {
+                $scope.service.value = response.data.service.value;
+            });
+    }, milliSeconds);
+    $scope.$on('$destroy', function () { $interval.cancel(intervalPromise); });
+};
+
 angular.module('cloudStoreClient')
   .controller('DashboardCtrl', function ($scope,$http,$interval) {
     $scope.status=true;
@@ -35,13 +45,19 @@ angular.module('cloudStoreClient')
           templateUrl: '/widget-templates/toggle-button.html',
           controller: function($scope, $http, $interval) {
               $scope.changeState = updateServiceValue;
-              var intervalPromise = $interval(function(){
-                  $http.get("/service/" + $scope.service.address)
-                      .then(function(response) {
-                        $scope.service.value = response.data.service.value;
-                      });
-              }, 3000);
-              $scope.$on('$destroy', function () { $interval.cancel(intervalPromise); });
+              pollService($scope, $http, $interval, 5000);
+          }
+      }
+  })
+  .directive('textLabel', function () {
+      return {
+          scope: {
+              service: "=service"
+          },
+          restrict: 'E',
+          templateUrl: '/widget-templates/text-label.html',
+          controller: function($scope, $http, $interval) {
+              pollService($scope, $http, $interval, 500);
           }
       }
   })
@@ -71,7 +87,7 @@ angular.module('cloudStoreClient')
 
               sliderElement.noUiSlider.on('change', function(){
                   scope.service.value = sliderElement.noUiSlider.get();
-                  updateServiceValue(scope.service)
+                  updateServiceValue(scope.service);
               });
           }
       }

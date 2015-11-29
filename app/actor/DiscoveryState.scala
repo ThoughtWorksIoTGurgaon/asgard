@@ -4,11 +4,11 @@ import java.security.MessageDigest
 
 import actor.DiscoverySupervisor._
 import model.{Appliance, Service}
-import model.profile.{SwitchProfile, SpeedProfile}
+import model.profile.{DistanceProfile, SwitchProfile, SpeedProfile}
 
 case object DiscoveryState {
   val service1 = Service.createService(SwitchProfile.id, "address:myid1")
-  val service2 = Service.createService(SwitchProfile.id, "address:myid2")
+  val service2 = Service.createService(DistanceProfile.id, "address:myid2")
   val service3 = Service.createService(SpeedProfile.id, "address:myid3")
 
   val allServices = Map[String, Service](

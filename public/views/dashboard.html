@@ -21,6 +21,7 @@
                   <li ng-repeat="service in appliance.services">
                     <toggle-button service="service" ng-if="service.widget == 'toggle-button'"></toggle-button>
                     <range-slider service="service" ng-if="service.widget == 'range-slider'"></range-slider>
+                    <text-label service="service" ng-if="service.widget == 'text-label'"></text-label>
                   </li>
                 </ul>
               </div>
