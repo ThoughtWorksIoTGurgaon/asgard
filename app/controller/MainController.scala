@@ -25,6 +25,17 @@ class MainController(val discoverySupervisor: ActorRef) extends Controller {
     }
   }
 
+  def getServiceAction(address: String) = Action.async {
+    val getService = discoverySupervisor
+      .ask(DiscoverySupervisor.GetService(address))
+      .mapTo[Service]
+
+    getService.map{
+      service =>
+        Ok(Json.obj("service" -> Json.toJson(service)))
+    }
+  }
+
 
   def getAllAppliancesAction = Action.async {
     val getAppliances = discoverySupervisor.ask(DiscoverySupervisor.GetAppliances).mapTo[List[Appliance]]

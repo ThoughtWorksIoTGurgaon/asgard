@@ -3,7 +3,7 @@
 angular.module('cloudStoreClient')
     .controller('ManageServiceCtrl', function ($scope,$http,$modal) {
         $scope.loadAllServices = function() {
-            $http.get('/services/all').then(function(response) {
+            $http.get('/services').then(function(response) {
                 $scope.services = response.data.services;
             }, function(response) {
                 $scope.services = [];
@@ -37,7 +37,7 @@ angular.module('cloudStoreClient')
         $scope.submit = function(service) {
             $modalInstance.close();
 
-            var serviceUrl = '/services/update';
+            var serviceUrl = '/service/update';
 
             $http({
                 method: 'POST',

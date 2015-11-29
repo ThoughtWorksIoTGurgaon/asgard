@@ -3,14 +3,15 @@
 # ~~~~
 
 GET         /appliances                 @controller.MainController.getAllAppliancesAction
-POST        /appliances/update          @controller.MainController.updateApplianceAction
-POST        /appliances/add         		@controller.MainController.addApplianceAction
-POST        /appliances/delete         	@controller.MainController.deleteApplianceAction
+POST        /appliance/update          @controller.MainController.updateApplianceAction
+POST        /appliance/add         		@controller.MainController.addApplianceAction
+POST        /appliance/delete         	@controller.MainController.deleteApplianceAction
 
-GET         /services/all        				@controller.MainController.getAllServicesAction
+GET         /services       				   @controller.MainController.getAllServicesAction
 GET         /services/unassigned        @controller.MainController.getUnassignedServicesAction
-POST        /services/update            @controller.MainController.updateServiceAction
-POST        /services/value             @controller.MainController.updateServiceValueAction
+POST        /service/update            @controller.MainController.updateServiceAction
+GET					/service/:address					@controller.MainController.getServiceAction(address)
+POST        /service/value             @controller.MainController.updateServiceValueAction
 
 GET         /                           controllers.Assets.at(path="/public", file="index.html")
 GET         /*file                      controllers.Assets.at(path="/public", file)

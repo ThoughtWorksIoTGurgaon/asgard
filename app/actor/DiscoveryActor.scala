@@ -112,6 +112,11 @@ class DiscoveryActor(queue: String, _supervisor: ActorRef) extends PersistentAct
       log.debug(s"${self.path.name} - Replying with all services : $allServices")
       sender ! allServices
 
+    case GetService(address) =>
+      val service = state.allServices.get(address).get
+      log.debug(s"${self.path.name} - Replying with service : $service")
+      sender ! service
+
     case GetAppliances =>
       val allServices = state.allServices
       val appliances = state.appliances.map{
@@ -122,7 +127,7 @@ class DiscoveryActor(queue: String, _supervisor: ActorRef) extends PersistentAct
           })
       }
 
-      log.debug(s"${self.path.name} - Replying with list of appliances : ${appliances}")
+      log.debug(s"${self.path.name} - Replying with list of appliances : $appliances")
       sender ! appliances
 
     case Snap => saveSnapshot(state)

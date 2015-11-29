@@ -88,6 +88,7 @@ object DiscoverySupervisor {
   case object GetUntaggedServices extends GetResource
   case object GetAppliances extends GetResource
   case object GetAllServices extends GetResource
+  case class GetService(address: String) extends GetResource
 
 
 

@@ -26,7 +26,7 @@ angular.module('cloudStoreClient')
   $scope.deleteAppliance = function(selectedAppliance){
       $http({
           method: 'POST',
-          url: "/appliances/delete",
+          url: "/appliance/delete",
           data: JSON.stringify(selectedAppliance)
       }).then(function(response){
           $scope.loadAvailableServices();
@@ -61,7 +61,7 @@ angular.module('cloudStoreClient')
         return newServices[service.address];
     });
 
-    var applianceServiceUrl = selectedAppliance ? '/appliances/update' : '/appliances/add';
+    var applianceServiceUrl = selectedAppliance ? '/appliance/update' : '/appliance/add';
 
     $http({
         method: 'POST',
