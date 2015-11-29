@@ -90,6 +90,6 @@ object DiscoverySupervisor {
   case object GetAllServices extends GetResource
 
 
- 
+
   case class UpdateDeviceState(widgetStatus: WidgetStatus) extends Command
 }

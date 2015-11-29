@@ -7,11 +7,12 @@ POST        /appliances/update          @controller.MainController.updateApplian
 POST        /appliances/add         		@controller.MainController.addApplianceAction
 POST        /appliances/delete         	@controller.MainController.deleteApplianceAction
 
+GET         /services/all        				@controller.MainController.getAllServicesAction
 GET         /services/unassigned        @controller.MainController.getUnassignedServicesAction
 POST        /services/update            @controller.MainController.updateServiceAction
 POST        /services/value             @controller.MainController.updateServiceValueAction
 
-GET         /*file                      controllers.Assets.at(path="/public", file)
 GET         /                           controllers.Assets.at(path="/public", file="index.html")
+GET         /*file                      controllers.Assets.at(path="/public", file)
 
 #

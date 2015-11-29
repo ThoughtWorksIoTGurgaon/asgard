@@ -6,7 +6,7 @@ case class Appliance(
   id: Option[String],
   title: Option[String],
   description: Option[String],
-  services: List[Service]
+  services: Set[Service]
 )
 
 object Appliance {

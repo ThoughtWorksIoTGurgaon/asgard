@@ -3,7 +3,7 @@
 angular.module('cloudStoreClient')
     .controller('ManageServiceCtrl', function ($scope,$http,$modal) {
         $scope.loadAllServices = function() {
-            $http.get('/services/unassigned').then(function(response) {
+            $http.get('/services/all').then(function(response) {
                 $scope.services = response.data.services;
             }, function(response) {
                 $scope.services = [];

@@ -16,17 +16,7 @@ object ServiceProfile {
 trait DeviceProfile extends Profile{
   override def processResponse(serviceResponse: ServiceResponse, callback: (AnyRef) => Unit): WidgetStatus = {
     val serviceProfiles = Json.parse(serviceResponse.data).validate[List[ServiceProfile]].get
-    val newServices = serviceProfiles.map{
-      serviceProfile => serviceProfile.profileId match {
-        case SwitchProfile.id =>
-          new Service(serviceProfile.address, serviceProfile.profileId, "", SwitchProfile.widget)
-            with SwitchProfile
-
-        case SpeedProfile.id =>
-          new Service(serviceProfile.address, serviceProfile.profileId, "", SpeedProfile.widget)
-            with SpeedProfile
-      }
-    }
+    val newServices = serviceProfiles.map(serviceProfile => Service.createService(serviceProfile))
 
     callback.apply(newServices)
     createWidgetStatus("New services add")

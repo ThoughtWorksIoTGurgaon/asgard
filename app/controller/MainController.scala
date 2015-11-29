@@ -34,7 +34,6 @@ class MainController(val discoverySupervisor: ActorRef) extends Controller {
     }
   }
 
-
   def addApplianceAction() = Action(parse.json) {
     request =>
       println(s"addApplianceAction got some request!! ${request.body}")

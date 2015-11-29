@@ -18,7 +18,6 @@ angular.module('cloudStoreClient')
     $scope.oneAtATime = true;
     $scope.loadAppliances = function(){
         $http.get("/appliances").then(function(response) {
-            console.log(response);
             $scope.appliances = response.data.appliances;
         }, function(response) {
         });

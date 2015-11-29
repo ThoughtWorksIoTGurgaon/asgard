@@ -1,13 +1,19 @@
 package model
 
+import model.profile.{ServiceProfile, SpeedProfile, SwitchProfile}
 import play.api.libs.json.Json
 
 case class Service(
 	address: String,
-	label: String,
+	var label: String,
 	var value: String,
 	widget: String
 ) extends Profile{
+	def updateLabel(service: Service): Service = {
+		this.label = service.label
+		this
+	}
+
 	override def processWidget(widgetStatus: WidgetStatus): ServiceRequest = {
 		createServiceRequest("default", widgetStatus.value)
 	}
@@ -27,8 +33,32 @@ case class Service(
 	override protected def updateValue(value: String): Unit = {
 		this.value = value
 	}
+
+	override def hashCode(): Int = address.hashCode()
+
+	override def equals(obj: scala.Any): Boolean = {
+		if (!obj.isInstanceOf[Service]){
+			return false
+		}
+
+		this.address.equals(obj.asInstanceOf[Service].address)
+	}
 }
 
 object Service{
 	implicit val serviceFormat = Json.format[Service]
+
+	def createService(profileId: String, address: String): Service ={
+		profileId match {
+			case SwitchProfile.id =>
+				new Service(address, profileId, "off", SwitchProfile.widget) with SwitchProfile
+
+			case SpeedProfile.id =>
+				new Service(address, profileId, "10", SpeedProfile.widget) with SpeedProfile
+		}
+	}
+
+	def createService(serviceProfile: ServiceProfile): Service ={
+		createService(serviceProfile.profileId, serviceProfile.address)
+	}
 }

@@ -12,84 +12,8 @@ import play.api.libs.json.Json
 import net.ceedubs.ficus.Ficus._
 import scala.concurrent.duration._
 import akka.persistence.{PersistentActor, RecoveryCompleted, SnapshotOffer}
-import java.security.MessageDigest
 import net.sigusr.mqtt.api._
 
-case object DiscoveryState {
-  val allServices = Map[String, Service](
-    "address:myid1" -> new Service("address:myid1","Speed","0", SpeedProfile.widget) with SpeedProfile
-    , "address:myid2"-> new Service("address:myid2","Switch","on", SwitchProfile.widget) with SwitchProfile
-    , "address:myid3" -> new Service("address:myid3","Switch","on", SwitchProfile.widget) with SwitchProfile
-  )
-
-  val dummyUntaggedServices = Set(
-    allServices("address:myid2")
-  )
-
-  val dummyAppliances = List(
-    Appliance(
-      Some("1"),
-      Some("Fan"),
-      Some("Bed room"),
-      List(
-        allServices("address:myid1")
-      , allServices("address:myid3")
-      )
-    )
-  )
-}
-
-case class DiscoveryState(
-  appliances: List[Appliance] = DiscoveryState.dummyAppliances,
-  allServices: Map[String, Service] = DiscoveryState.allServices,
-  untaggedServices: Set[Service] = DiscoveryState.dummyUntaggedServices
-) {
-  def updated(evt: DiscoveryEvent): DiscoveryState = {
-    evt match {
-      case ApplianceAdded(appliance) =>
-        val uniqueId = appliance.services.foldLeft(""){(a,switch) => a + switch.address}
-
-        copy(
-          appliance.copy(id = Some(sha(uniqueId))) :: appliances,
-          allServices,
-          untaggedServices -- appliance.services
-        )
-
-      case ApplianceConfigured(updatedAppliance) =>
-        val applianceToUpdate = appliances.find(_.id == updatedAppliance.id).get
-        copy(
-          appliances
-            .filter(_.id != updatedAppliance.id) :+ updatedAppliance,
-          allServices,
-          (untaggedServices ++ applianceToUpdate.services) -- updatedAppliance.services
-        )
-
-      case ApplianceDeleted(appliance) =>
-        copy(appliances.filter(_.id != appliance.id), allServices, untaggedServices ++ appliance.services)
-
-      case ServiceConfigured(service) =>
-        val serviceToUpdate = untaggedServices.find(_.address == service.address).get
-        copy(
-          appliances,
-          allServices + (service.address -> service),
-          (untaggedServices -- Set(serviceToUpdate)) ++ Set(service)
-        )
-
-      case ServiceDiscovered(services) =>
-        val newServices = services.filter(service => !(allServices contains service.address))
-
-        val servicesMap = newServices.map{
-          service => (service.address, service)
-        }.toMap[String, Service]
-
-        copy(appliances, allServices ++ servicesMap, untaggedServices ++ newServices)
-    }
-  }
-
-  def sha(s: String) = {
-    MessageDigest.getInstance("SHA-256").digest(s.getBytes).toString
-  }
-}
 
 class DiscoveryActor(queue: String, _supervisor: ActorRef) extends PersistentActor {
   import context.dispatcher
@@ -102,7 +26,7 @@ class DiscoveryActor(queue: String, _supervisor: ActorRef) extends PersistentAct
   val supervisor = _supervisor
   val mqttAutoReconnectIntervalDuration = config.as[FiniteDuration]("mqtt.autoreconnect.intervalduration")
   val log = Logger.logger
-  var state = DiscoveryState()
+  var state = new DiscoveryState
   case object Snap
 
   val mqttManager = context.actorOf(
@@ -148,7 +72,7 @@ class DiscoveryActor(queue: String, _supervisor: ActorRef) extends PersistentAct
       sender ! untaggedServices
 
     case GetAllServices =>
-      val allServices = state.allServices.values.toList
+      val allServices = state.allServices.toList
       log.debug(s"${self.path.name} - Replying with all services : $allServices")
       sender ! allServices
 
@@ -179,7 +103,7 @@ class DiscoveryActor(queue: String, _supervisor: ActorRef) extends PersistentAct
       persist(event)(updateState)
 
     case GetUntaggedServices =>
-      val untaggedServices = state.untaggedServices.toList
+      val untaggedServices = state.unAssginedServices
       log.debug(s"${self.path.name} - Replying with untagged services : $untaggedServices")
       sender ! untaggedServices
 
@@ -189,8 +113,17 @@ class DiscoveryActor(queue: String, _supervisor: ActorRef) extends PersistentAct
       sender ! allServices
 
     case GetAppliances =>
-      log.debug(s"${self.path.name} - Replying with list of appliances : ${state.appliances}")
-      sender ! state.appliances
+      val allServices = state.allServices
+      val appliances = state.appliances.map{
+        appliance =>
+          appliance.copy(services = appliance.services.map{
+            service =>
+              allServices.get(service.address).get
+          })
+      }
+
+      log.debug(s"${self.path.name} - Replying with list of appliances : ${appliances}")
+      sender ! appliances
 
     case Snap => saveSnapshot(state)
 
@@ -213,27 +146,43 @@ class DiscoveryActor(queue: String, _supervisor: ActorRef) extends PersistentAct
 
       topic match {
         case addressParserRegex(address) =>
-          Json.parse(message).validate[ServiceResponse].map{
-            serviceResponse =>
-              val service =
-                if(state.allServices contains address){
-                  state.allServices get address get
-                } else if (serviceResponse.response == "discover-service") {
-                  val deviceService = new Service(address, "Device", "some", "device") with DeviceProfile
-                  updateState(new ServiceDiscovered(deviceService +: List.empty))
-                  deviceService
-                }
-
-              service match {
-                case _:DeviceProfile =>
-                  service.asInstanceOf[DeviceProfile].processResponse(
-                    serviceResponse,
-                    newServices => updateState(new ServiceDiscovered(newServices.asInstanceOf[List[Service]]))
-                  )
-                case _:Profile =>
-                  service.asInstanceOf[Profile].processResponse(serviceResponse)
-              }
-          }
+          log.debug(s"parsing response for service $address")
+          Json.parse(message).validate[List[ServiceResponse]].map{
+            serviceResponses => serviceResponses.foreach(
+              serviceResponse => processServiceResponse(address, serviceResponse)
+            )
+          }.recoverTotal(e => log.debug(s"$message not a valid list of ServiceResponse"))
+        case _ =>
+          log.debug(s"Invalid topic $topic")
       }
+  }
+
+  def processServiceResponse(address: String, serviceResponse: ServiceResponse):Unit = {
+    val service =
+      if (state.allServices contains address) {
+        state.allServices.get(address).get
+      } else if (serviceResponse.response == "discover-services") {
+        val deviceService = new Service(address, "Device", "some", "device") with DeviceProfile
+        log.debug(s"Adding new device at address $address")
+        updateState(new ServiceDiscovered(deviceService +: List.empty))
+        deviceService
+      } else {
+        log.debug(s"Device/service not registered $serviceResponse")
+      }
+
+    service match {
+      case _: DeviceProfile =>
+        service.asInstanceOf[DeviceProfile].processResponse(
+          serviceResponse,
+          newServices => {
+            log.debug(s"Adding new services $newServices upon handling discover-service packet")
+            updateState(new ServiceDiscovered(newServices.asInstanceOf[List[Service]]))
+          }
+        )
+      case _: Profile =>
+        log.debug(s"Processing response $serviceResponse for $address")
+
+        service.asInstanceOf[Profile].processResponse(serviceResponse)
+    }
   }
 }
