@@ -2,7 +2,7 @@ package actor
 
 import java.net.{ InetAddress, InetSocketAddress }
 import actor.DiscoverySupervisor._
-import akka.actor.ActorRef
+import akka.actor.{Actor, ActorRef}
 import com.typesafe.config.{ Config, ConfigFactory }
 import model._
 import model.profile._
@@ -15,7 +15,7 @@ import akka.persistence.{PersistentActor, RecoveryCompleted, SnapshotOffer}
 import net.sigusr.mqtt.api._
 
 
-class DiscoveryActor(queue: String, _supervisor: ActorRef) extends PersistentActor {
+class DiscoveryActor(queue: String, _supervisor: ActorRef) extends akka.actor.Actor {
   import context.dispatcher
 
   val persistenceId = ""
@@ -65,7 +65,7 @@ class DiscoveryActor(queue: String, _supervisor: ActorRef) extends PersistentAct
       recoveryCompleted()
   }
 
-  override def receiveCommand: Receive = {
+  def receive: Receive = {
     case GetUntaggedServices =>
       val untaggedServices = state.untaggedServices.toList
       log.debug(s"${self.path.name} - Replying with untagged services : $untaggedServices")
@@ -91,16 +91,12 @@ class DiscoveryActor(queue: String, _supervisor: ActorRef) extends PersistentAct
       log.debug(s"Connection to $mqttHost:$mqttPort [$reason] - trying reconnect in $mqttAutoReconnectIntervalDuration")
       context.system.scheduler.scheduleOnce(mqttAutoReconnectIntervalDuration, mqttManager, Connect(localPublisher))
       supervisor ! WaitingReconnect
-
-    case Snap =>
-      log.debug(s"${self.path.name} - Saving snapshot")
-      saveSnapshot(state)
   }
 
   def ready(mqttManager: ActorRef): Receive = {
     case event:DiscoveryEvent =>
       log.debug(s"${self.path.name} - Got discovery event")
-      persist(event)(updateState)
+      updateState(event)
 
     case GetUntaggedServices =>
       val untaggedServices = state.unAssginedServices
@@ -129,8 +125,6 @@ class DiscoveryActor(queue: String, _supervisor: ActorRef) extends PersistentAct
 
       log.debug(s"${self.path.name} - Replying with list of appliances : $appliances")
       sender ! appliances
-
-    case Snap => saveSnapshot(state)
 
     case UpdateDeviceState(widgetStatus) ⇒
       val service = state.allServices.get(widgetStatus.address).get

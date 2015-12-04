@@ -12,20 +12,22 @@ case object DiscoveryState {
   val service3 = Service.createService(SpeedProfile.id, "address:myid3")
 
   val allServices = Map[String, Service](
-    service1.address -> service1
-    , service2.address -> service2
-    , service3.address -> service3
+//    service1.address -> service1
+//    , service2.address -> service2
+//    , service3.address -> service3
   )
 
-  val untaggedServices = Set[Service](service2)
+  val untaggedServices = Set[Service](
+//    service2
+  )
 
-  val dummyAppliances = List(
-    Appliance(
-      Some("1"),
-      Some("Fan"),
-      Some("Bed room"),
-      Set(service1, service3)
-    )
+  val dummyAppliances = List[Appliance](
+//    Appliance(
+//      Some("1"),
+//      Some("Fan"),
+//      Some("Bed room"),
+//      Set(service1, service3)
+//    )
   )
 }
 

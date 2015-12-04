@@ -4,6 +4,7 @@ import model.{ServiceResponse, Profile, ServiceRequest, WidgetStatus}
 
 trait SwitchProfile extends Profile{
   override def processWidget(widgetStatus: WidgetStatus): ServiceRequest = {
+    updateValue(widgetStatus.value)
     createServiceRequest(if (widgetStatus.value == "on") "switch-on" else  "switch-off", "")
   }
 
