@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('cloudStoreClient')
-    .controller('ManageServiceCtrl', function ($scope,$http,$modal) {
+    .controller('ManageServiceCtrl', function ($scope,$http,$modal, $interval) {
         $scope.loadAllServices = function() {
             $http.get('/services').then(function(response) {
                 $scope.services = response.data.services;
@@ -26,6 +26,9 @@ angular.module('cloudStoreClient')
         $scope.$on("service-configured", function(event, service) {
             $scope.loadAllServices();
         });
+
+        var intervalPromise = $interval($scope.loadAllServices, 2000);
+        $scope.$on('$destroy', function () { $interval.cancel(intervalPromise); });
     });
 
 

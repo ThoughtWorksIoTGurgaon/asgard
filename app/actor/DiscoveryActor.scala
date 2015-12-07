@@ -67,12 +67,12 @@ class DiscoveryActor(queue: String, _supervisor: ActorRef) extends akka.actor.Ac
 
   def receive: Receive = {
     case GetUntaggedServices =>
-      val untaggedServices = state.untaggedServices.toList
+      val untaggedServices = state.untaggedServices.toList.filter(_.isInstanceOf[DeviceProfile] == false)
       log.debug(s"${self.path.name} - Replying with untagged services : $untaggedServices")
       sender ! untaggedServices
 
     case GetAllServices =>
-      val allServices = state.allServices.toList
+      val allServices = state.allServices.toList.filter(_._2.isInstanceOf[DeviceProfile] == false)
       log.debug(s"${self.path.name} - Replying with all services : $allServices")
       sender ! allServices
 
@@ -99,12 +99,12 @@ class DiscoveryActor(queue: String, _supervisor: ActorRef) extends akka.actor.Ac
       updateState(event)
 
     case GetUntaggedServices =>
-      val untaggedServices = state.unAssginedServices
+      val untaggedServices = state.unAssginedServices.filter(_.isInstanceOf[DeviceProfile] == false)
       log.debug(s"${self.path.name} - Replying with untagged services : $untaggedServices")
       sender ! untaggedServices
 
     case GetAllServices =>
-      val allServices = state.allServices.values.toList
+      val allServices = state.allServices.values.toList.filter(_.isInstanceOf[DeviceProfile] == false)
       log.debug(s"${self.path.name} - Replying with all services : $allServices")
       sender ! allServices
 
@@ -161,7 +161,7 @@ class DiscoveryActor(queue: String, _supervisor: ActorRef) extends akka.actor.Ac
       if (state.allServices contains address) {
         state.allServices.get(address).get
       } else if (serviceResponse.response == "discover-services") {
-        val deviceService = new Service(address, "Device", "some", "device") with DeviceProfile
+        val deviceService = Service.createService(DeviceProfile.id, address)
         log.debug(s"Adding new device at address $address")
         updateState(new ServiceDiscovered(deviceService +: List.empty))
         deviceService

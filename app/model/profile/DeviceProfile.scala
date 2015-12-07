@@ -23,4 +23,7 @@ trait DeviceProfile extends Profile{
   }
 }
 
-object DeviceProfile
+object DeviceProfile{
+  val id = "DEV"
+  val widget = "device-widget"
+}

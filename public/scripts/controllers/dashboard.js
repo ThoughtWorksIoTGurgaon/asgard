@@ -23,7 +23,7 @@ var pollService = function($scope, $http, $interval, milliSeconds){
 };
 
 angular.module('cloudStoreClient')
-  .controller('DashboardCtrl', function ($scope,$http,$interval) {
+  .controller('DashboardCtrl', function ($scope,$http) {
     $scope.status=true;
     $scope.oneAtATime = true;
     $scope.loadAppliances = function(){
@@ -33,8 +33,6 @@ angular.module('cloudStoreClient')
             $scope.appliances = [];
         });
     };
-
-    //$interval($scope.loadAppliances, 5000);
   })
   .directive('toggleButton', function () {
       return {

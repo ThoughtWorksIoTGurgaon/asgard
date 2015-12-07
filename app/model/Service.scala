@@ -1,6 +1,6 @@
 package model
 
-import model.profile.{DistanceProfile, ServiceProfile, SpeedProfile, SwitchProfile}
+import model.profile._
 import play.api.libs.json.Json
 
 case class Service(
@@ -50,6 +50,9 @@ object Service{
 
 	def createService(profileId: String, address: String): Service ={
 		profileId match {
+			case DeviceProfile.id =>
+				new Service(address, profileId, "10", DeviceProfile.widget) with DeviceProfile
+
 			case SwitchProfile.id =>
 				new Service(address, profileId, "off", SwitchProfile.widget) with SwitchProfile
 
